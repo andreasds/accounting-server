@@ -83,6 +83,7 @@ dependencies {
 
     compile 'org.grails.plugins:spring-security-core:3.0.3'
     compile 'org.grails.plugins:spring-security-rest:2.0.0.M2'
+    compile 'org.grails.plugins:spring-security-rest-gorm:2.0.0.M2'
 }
 
 task wrapper(type: Wrapper) {
