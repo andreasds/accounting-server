@@ -130,7 +130,7 @@ class AdministratorService {
         // ===== dashboard =====
         Menu menuDashboard = Menu.findByNama('Dashboard') ?: new Menu (
             nama: 'Dashboard',
-            path: '#',
+            path: '/home.xhtml',
             icon: 'fa fa-tachometer',
             parent: null,
             role: roleUser
