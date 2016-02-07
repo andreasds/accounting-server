@@ -11,17 +11,20 @@ class AdministratorService {
     
     def init() {
         // ########## user ##########
-        User admin = User.findByUsername('admin') ?: new User('admin', 'admin').save(failOnError: true)
-        User lilik = User.findByUsername('lilik') ?: new User('lilik', 'lilik').save(failOnError: true)
+        User andreas = User.findByUsername('andreas') ?: new User('andreas', 'andreas123').save(failOnError: true)
+        User lilik = User.findByUsername('lilik') ?: new User('lilik', 'lilik123').save(failOnError: true)
+        User yohanna = User.findByUsername('yohanna') ?: new User('yohanna', 'yohanna123').save(failOnError: true)
         
         // ########## role ##########
         Role roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role('ROLE_ADMIN').save(failOnError: true)
         Role roleUser = Role.findByAuthority('ROLE_USER') ?: new Role('ROLE_USER').save(failOnError: true)
         
         // ########## role user ##########
-        UserRole.findByUserAndRole(admin, roleAdmin) ?: UserRole.create(admin, roleAdmin, true)
-        UserRole.findByUserAndRole(admin, roleUser) ?: UserRole.create(admin, roleUser, true)
+        UserRole.findByUserAndRole(andreas, roleAdmin) ?: UserRole.create(andreas, roleAdmin, true)
+        UserRole.findByUserAndRole(andreas, roleUser) ?: UserRole.create(andreas, roleUser, true)
+        UserRole.findByUserAndRole(lilik, roleAdmin) ?: UserRole.create(lilik, roleAdmin, true)
         UserRole.findByUserAndRole(lilik, roleUser) ?: UserRole.create(lilik, roleUser, true)
+        UserRole.findByUserAndRole(yohanna, roleUser) ?: UserRole.create(yohanna, roleUser, true)
         
         // ########## menu ##########
         // ===== data administrator =====
