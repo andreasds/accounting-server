@@ -1,7 +1,5 @@
 package com.andreas.accounting.util
 
-import grails.converters.JSON
-
 import com.andreas.accounting.util.Menu
 import grails.transaction.Transactional
 
@@ -13,7 +11,7 @@ class MenuService {
     def authorizedMenu() {
         def result = []
         def roles = springSecurityService.currentUser.getAuthorities()
-        def parentsMenu = Menu.createCriteria().list {
+        def parentsMenu = Menu.withCriteria {
             'in'('role', roles)
             isNull('parent')
             order('nama', 'asc')
@@ -33,13 +31,13 @@ class MenuService {
     
     def getChildMenu(parentMenu, roles) {
         def result = []
-        def childsMenu = Menu.createCriteria().list {
+        def childsMenu = Menu.withCriteria {
             'in'('role', roles)
             eq('parent', parentMenu)
             order('nama', 'asc')
         }
         
-        if(childsMenu.empty) {
+        if (childsMenu.empty) {
             return null
         } else {
             childsMenu.each { childMenu ->

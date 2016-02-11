@@ -38,7 +38,7 @@ class AdministratorService {
         
         // daftar nama
         Menu menuDaftarNama = Menu.findByNama('Daftar Nama') ?: new Menu (
-            nama: 'Data Nama',
+            nama: 'Daftar Nama',
             path: '#',
             icon: 'fa fa-users',
             parent: menuAdministrator,
