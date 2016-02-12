@@ -47,7 +47,7 @@ class AdministratorService {
         Menu menuPembeli = Menu.findByNama('Pembeli') ?: new Menu (
             nama: 'Pembeli',
             path: '/modules/administrator/daftar-nama/pembeli/list.xhtml',
-            icon: 'fa fa-user-plus',
+            icon: 'fa fa-user',
             parent: menuDaftarNama,
             role: roleAdmin
         ).save(flush: true)

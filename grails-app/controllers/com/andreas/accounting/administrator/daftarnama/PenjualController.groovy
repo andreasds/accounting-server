@@ -1,14 +1,14 @@
 package com.andreas.accounting.administrator.daftarnama
 
-import com.andreas.accounting.administrator.daftarnama.Perusahaan
+import com.andreas.accounting.administrator.daftarnama.Orang
 import grails.converters.JSON
 
-class PerusahaanController {
+class PenjualController {
     
-    def perusahaanService
+    def penjualService
 
     def index() {
-        render perusahaanService.listAll() as JSON
+        render penjualService.listAll() as JSON
     }
     
     def list() {
@@ -16,30 +16,30 @@ class PerusahaanController {
         params.max = params.max != 'null' ? params.int('max') : 10
         params.sort = params.sort != 'null' ? params.sort : 'nama'
         params.order = params.order != 'null' ? params.order : 'asc'
-        render perusahaanService.list(params) as JSON
+        render penjualService.list(params) as JSON
     }
-
+    
     def listNama() {
-        render perusahaanService.listNama() as JSON
+        render penjualService.listNama() as JSON
     }
     
     def save() {
-        render perusahaanService.save(request.JSON) as JSON
+        render penjualService.save(request.JSON) as JSON
     }
     
     def get(long id) {
-        render perusahaanService.get(id) as JSON
+        render penjualService.get(id) as JSON
     }
     
     def update(long id) {
-        render perusahaanService.update(id, request.JSON) as JSON
+        render penjualService.update(id, request.JSON) as JSON
     }
     
     def delete(long id) {
-        render perusahaanService.delete(id) as JSON
+        render penjualService.delete(id) as JSON
     }
     
     def count() {
-        render perusahaanService.count(params)
+        render penjualService.count(params)
     }
 }

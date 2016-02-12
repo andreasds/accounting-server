@@ -1,29 +1,39 @@
 package com.andreas.accounting.administrator.daftarnama
 
+import com.andreas.accounting.administrator.daftarnama.Orang
 import com.andreas.accounting.administrator.daftarnama.Perusahaan
 import grails.converters.JSON
 import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
-class PerusahaanService {
+class PenjualService {
     
     def listAll() {
-        return Perusahaan.withCriteria {
+        return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                eq('activeStatus', 'Y')
+            }
+            eq('tipe', 'VENDOR')
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
-                property('alamat', 'alamat')
-                property('kota', 'kota')
+                property('telepon', 'telepon')
+                property('hp', 'hp')
+                property('perusahaan', 'perusahaan')
             }
         }
     }
     
     def list(params) {
-        return Perusahaan.withCriteria {
+        return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                eq('activeStatus', 'Y')
+            }
+            eq('tipe', 'VENDOR')
             eq('activeStatus', 'Y')
             order(params.sort, params.order)
             maxResults(params.max)
@@ -31,15 +41,20 @@ class PerusahaanService {
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
-                property('alamat', 'alamat')
-                property('kota', 'kota')
+                property('telepon', 'telepon')
+                property('hp', 'hp')
+                property('perusahaan', 'perusahaan')
             }
         }
     }
     
     def listNama() {
-        return Perusahaan.withCriteria {
+        return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                eq('activeStatus', 'Y')
+            }
+            eq('tipe', 'VENDOR')
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
@@ -49,16 +64,18 @@ class PerusahaanService {
     }
 
     def save(data) {
-        def perusahaan = new Perusahaan()
-        perusahaan.nama = data.nama
-        perusahaan.alamat = data.alamat
-        perusahaan.kota = data.kota
-        perusahaan.activeStatus = 'Y'
+        def orang = new Orang()
+        orang.tipe = 'VENDOR'
+        orang.nama = data.nama
+        orang.telepon = data.telepon
+        orang.hp = data.hp
+        orang.activeStatus = 'Y'
+        orang.perusahaan = Perusahaan.get(data.perusahaan.id)
         
         def response = [:]
-        if (perusahaan.save(flush: true)) {
+        if (orang.save(flush: true)) {
             response['message'] = 'succeed'
-            response['id'] = perusahaan.id
+            response['id'] = orang.id
         } else {
             response['message'] = 'failed'
         }
@@ -66,29 +83,36 @@ class PerusahaanService {
     }
     
     def get(id) {
-        return Perusahaan.withCriteria {
+        return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                eq('activeStatus', 'Y')
+            }
             eq('id', id)
+            eq('tipe', 'VENDOR')
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
-                property('alamat', 'alamat')
-                property('kota', 'kota')
+                property('telepon', 'telepon')
+                property('hp', 'hp')
+                property('perusahaan', 'perusahaan')
             }
         }[0]
     }
     
     def update(id, data) {
-        def perusahaan = Perusahaan.get(id)
-        perusahaan.nama = data.nama
-        perusahaan.alamat = data.alamat
-        perusahaan.kota = data.kota
+        def orang = Orang.get(id)
+        orang.tipe = 'VENDOR'
+        orang.nama = data.nama
+        orang.telepon = data.telepon
+        orang.hp = data.hp
+        orang.perusahaan = Perusahaan.get(data.perusahaan.id)
         
         def response = [:]
-        if (perusahaan.save(flush: true)) {
+        if (orang.save(flush: true)) {
             response['message'] = 'succeed'
-            response['id'] = perusahaan.id
+            response['id'] = orang.id
         } else {
             response['message'] = 'failed'
         }
@@ -96,11 +120,11 @@ class PerusahaanService {
     }
     
     def delete(id) {
-        def perusahaan = Perusahaan.get(id)
-        perusahaan.activeStatus = 'N'
+        def orang = Orang.get(id)
+        orang.activeStatus = 'N'
         
         def response = [:]
-        if (perusahaan.save(flush: true)) {
+        if (orang.save(flush: true)) {
             response['message'] = 'succeed'
         } else {
             response['message'] = 'failed'
@@ -109,8 +133,12 @@ class PerusahaanService {
     }
     
     def count(params) {
-        return Perusahaan.withCriteria {
+        return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                eq('activeStatus', 'Y')
+            }
+            eq('tipe', 'VENDOR')
             eq('activeStatus', 'Y')
         }.size()
     }
