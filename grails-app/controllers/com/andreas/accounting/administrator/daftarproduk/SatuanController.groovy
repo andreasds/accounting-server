@@ -1,13 +1,13 @@
-package com.andreas.accounting.administrator
+package com.andreas.accounting.administrator.daftarproduk
 
 import grails.converters.JSON
 
-class ProdukController {
+class SatuanController {
     
-    def produkService
+    def satuanService
 
     def index() {
-        render produkService.listAll() as JSON
+        render satuanService.listAll() as JSON
     }
     
     def list() {
@@ -15,30 +15,30 @@ class ProdukController {
         params.max = params.max != 'null' ? params.int('max') : 10
         params.sort = params.sort != 'null' ? params.sort : 'kode'
         params.order = params.order != 'null' ? params.order : 'asc'
-        render produkService.list(params) as JSON
+        render satuanService.list(params) as JSON
     }
-    
+
     def listKode() {
-        render produkService.listKode() as JSON
+        render satuanService.listKode() as JSON
     }
     
     def save() {
-        render produkService.save(request.JSON) as JSON
+        render satuanService.save(request.JSON) as JSON
     }
     
     def get(long id) {
-        render produkService.get(id) as JSON
+        render satuanService.get(id) as JSON
     }
     
     def update(long id) {
-        render produkService.update(id, request.JSON) as JSON
+        render satuanService.update(id, request.JSON) as JSON
     }
     
     def delete(long id) {
-        render produkService.delete(id) as JSON
+        render satuanService.delete(id) as JSON
     }
     
     def count() {
-        render produkService.count(params)
+        render satuanService.count(params)
     }
 }

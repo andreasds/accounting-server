@@ -1,4 +1,4 @@
-package com.andreas.accounting.administrator
+package com.andreas.accounting.administrator.daftarproduk
 
 class Satuan {
 

@@ -1,6 +1,6 @@
-package com.andreas.accounting.administrator
+package com.andreas.accounting.administrator.daftarproduk
 
-import com.andreas.accounting.administrator.Satuan
+import com.andreas.accounting.administrator.daftarproduk.Satuan
 
 class Produk {
 
