@@ -1,0 +1,138 @@
+package com.andreas.accounting.administrator
+
+import com.andreas.accounting.administrator.Produk
+import com.andreas.accounting.administrator.Satuan
+import grails.converters.JSON
+import grails.transaction.Transactional
+import org.hibernate.criterion.CriteriaSpecification
+
+@Transactional
+class ProdukService {
+    
+    def listAll() {
+        return Produk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            satuan {
+                eq('activeStatus', 'Y')
+            }
+            eq('activeStatus', 'Y')
+            projections {
+                property('id', 'id')
+                property('kode', 'kode')
+                property('deskripsi', 'deskripsi')
+                property('satuan', 'satuan')
+            }
+        }
+    }
+    
+    def list(params) {
+        return Produk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            satuan {
+                eq('activeStatus', 'Y')
+            }
+            eq('activeStatus', 'Y')
+            order(params.sort, params.order)
+            maxResults(params.max)
+            firstResult(params.offset)
+            projections {
+                property('id', 'id')
+                property('kode', 'kode')
+                property('deskripsi', 'deskripsi')
+                property('satuan', 'satuan')
+            }
+        }
+    }
+    
+    def listKode() {
+        return Produk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            satuan {
+                eq('activeStatus', 'Y')
+            }
+            eq('activeStatus', 'Y')
+            projections {
+                property('id', 'id')
+                property('kode', 'kode')
+                property('deskripsi', 'deskripsi')
+            }
+        }
+    }
+
+    def save(data) {
+        def produk = new Produk()
+        produk.kode = data.kode
+        produk.deskripsi = data.deskripsi
+        produk.jumlahAwal = 0
+        produk.hargaBeliAwal = 0
+        produk.activeStatus = 'Y'
+        produk.satuan = Satuan.get(data.satuan.id)
+        
+        def response = [:]
+        if (produk.save(flush: true)) {
+            response['message'] = 'succeed'
+            response['id'] = produk.id
+        } else {
+            response['message'] = 'failed'
+        }
+        return response
+    }
+    
+    def get(id) {
+        return Produk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            satuan {
+                eq('activeStatus', 'Y')
+            }
+            eq('id', id)
+            eq('activeStatus', 'Y')
+            projections {
+                property('id', 'id')
+                property('kode', 'kode')
+                property('deskripsi', 'deskripsi')
+                property('satuan', 'satuan')
+            }
+        }[0]
+    }
+    
+    def update(id, data) {
+        def produk = Produk.get(id)
+        produk.kode = data.kode
+        produk.deskripsi = data.deskripsi
+        produk.jumlahAwal = data.jumlahAwal
+        produk.hargaBeliAwal = data.hargaBeliAwal
+        produk.satuan = Satuan.get(data.satuan.id)
+        
+        def response = [:]
+        if (produk.save(flush: true)) {
+            response['message'] = 'succeed'
+            response['id'] = produk.id
+        } else {
+            response['message'] = 'failed'
+        }
+        return response
+    }
+    
+    def delete(id) {
+        def produk = Produk.get(id)
+        produk.activeStatus = 'N'
+        
+        def response = [:]
+        if (produk.save(flush: true)) {
+            response['message'] = 'succeed'
+        } else {
+            response['message'] = 'failed'
+        }
+        return response
+    }
+    
+    def count(params) {
+        return Produk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            satuan {
+                eq('activeStatus', 'Y')
+            }
+            eq('activeStatus', 'Y')
+        }.size()
+    }
+}

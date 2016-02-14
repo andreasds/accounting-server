@@ -66,12 +66,33 @@ class AdministratorService {
             role: roleAdmin
         ).save(flush: true)
         
-        // data produk
-        Menu menuProduk = Menu.findByNama('Produk') ?: new Menu (
-            nama: 'Produk',
-            path: '/modules/administrator/produk/list.xhtml',
+        // daftar produk
+        Menu menuDaftarProduk = Menu.findByNama('Daftar Produk') ?: new Menu (
+            nama: 'Daftar Produk',
+            path: '#',
             icon: 'fa fa-product-hunt',
             parent: menuAdministrator,
+            role: roleUser
+        ).save(flush: true)
+        Menu menuHarga = Menu.findByNama('Harga') ?: new Menu (
+            nama: 'Harga',
+            path: '/modules/administrator/daftar-produk/harga/list.xhtml',
+            icon: 'fa fa-money',
+            parent: menuDaftarProduk,
+            role: roleAdmin
+        ).save(flush: true)
+        Menu menuProduk = Menu.findByNama('Produk') ?: new Menu (
+            nama: 'Produk',
+            path: '/modules/administrator/daftar-produk/produk/list.xhtml',
+            icon: 'fa fa-product-hunt',
+            parent: menuDaftarProduk,
+            role: roleUser
+        ).save(flush: true)
+        Menu menuSatuanPengukuran = Menu.findByNama('Satuan Pengukuran') ?: new Menu (
+            nama: 'Satuan Pengukuran',
+            path: '/modules/administrator/daftar-produk/satuan-pengukuran/list.xhtml',
+            icon: 'fa fa-tag',
+            parent: menuDaftarProduk,
             role: roleUser
         ).save(flush: true)
         
@@ -119,15 +140,6 @@ class AdministratorService {
             icon: 'fa fa-money',
             parent: menuSaldoAwal,
             role: roleAdmin
-        ).save(flush: true)
-        
-        // data satuan pengukuran
-        Menu menuSatuanPengukuran = Menu.findByNama('Satuan Pengukuran') ?: new Menu (
-            nama: 'Satuan Pengukuran',
-            path: '/modules/administrator/satuan-pengukuran/list.xhtml',
-            icon: 'fa fa-tag',
-            parent: menuAdministrator,
-            role: roleUser
         ).save(flush: true)
         
         // ===== dashboard =====
