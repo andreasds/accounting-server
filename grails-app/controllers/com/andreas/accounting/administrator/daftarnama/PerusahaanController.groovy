@@ -1,6 +1,5 @@
 package com.andreas.accounting.administrator.daftarnama
 
-import com.andreas.accounting.administrator.daftarnama.Perusahaan
 import grails.converters.JSON
 
 class PerusahaanController {
