@@ -1,5 +1,6 @@
 package com.andreas.accounting.administrator.daftarproduk
 
+import com.andreas.accounting.administrator.daftarproduk.KategoriProduk
 import com.andreas.accounting.administrator.daftarproduk.Produk
 import com.andreas.accounting.administrator.daftarproduk.Satuan
 import grails.converters.JSON
@@ -12,14 +13,18 @@ class ProdukService {
     def listAll() {
         return Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            kategoriProduk {
+                eq('activeStatus', 'Y')
+            }
             satuan {
                 eq('activeStatus', 'Y')
             }
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
-                property('kode', 'kode')
+                property('indeks', 'indeks')
                 property('deskripsi', 'deskripsi')
+                property('kategoriProduk', 'kategoriProduk')
                 property('satuan', 'satuan')
             }
         }
@@ -28,6 +33,10 @@ class ProdukService {
     def list(params) {
         return Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            kategoriProduk {
+                eq('activeStatus', 'Y')
+                order('kode', params.order)
+            }
             satuan {
                 eq('activeStatus', 'Y')
             }
@@ -37,8 +46,9 @@ class ProdukService {
             firstResult(params.offset)
             projections {
                 property('id', 'id')
-                property('kode', 'kode')
+                property('indeks', 'indeks')
                 property('deskripsi', 'deskripsi')
+                property('kategoriProduk', 'kategoriProduk')
                 property('satuan', 'satuan')
             }
         }
@@ -47,25 +57,39 @@ class ProdukService {
     def listKode() {
         return Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            kategoriProduk {
+                eq('activeStatus', 'Y')
+            }
             satuan {
                 eq('activeStatus', 'Y')
             }
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
-                property('kode', 'kode')
-                property('deskripsi', 'deskripsi')
+                property('indeks', 'indeks')
+                property('kategoriProduk', 'kategoriProduk')
             }
         }
     }
 
     def save(data) {
+        def indeks = Produk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            kategoriProduk {
+                eq('id', data.kategoriProduk.id.longValue())
+            }
+            order('indeks', 'desc')
+            projections {
+                property('indeks', 'indeks')
+            }
+        }
         def produk = new Produk()
-        produk.kode = data.kode
+        produk.indeks = indeks.size() > 0 ? indeks[0]['indeks'] + 1 : 1
         produk.deskripsi = data.deskripsi
         produk.jumlahAwal = 0
         produk.hargaBeliAwal = 0
         produk.activeStatus = 'Y'
+        produk.kategoriProduk = KategoriProduk.get(data.kategoriProduk.id)
         produk.satuan = Satuan.get(data.satuan.id)
         
         def response = [:]
@@ -81,6 +105,9 @@ class ProdukService {
     def get(id) {
         return Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            kategoriProduk {
+                eq('activeStatus', 'Y')
+            }
             satuan {
                 eq('activeStatus', 'Y')
             }
@@ -88,8 +115,9 @@ class ProdukService {
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
-                property('kode', 'kode')
+                property('indeks', 'indeks')
                 property('deskripsi', 'deskripsi')
+                property('kategoriProduk', 'kategoriProduk')
                 property('satuan', 'satuan')
             }
         }[0]
@@ -97,10 +125,25 @@ class ProdukService {
     
     def update(id, data) {
         def produk = Produk.get(id)
-        produk.kode = data.kode
+        if (produk.kategoriProduk.id != data.kategoriProduk.id) {
+            def indeks = Produk.withCriteria {
+                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                kategoriProduk {
+                    eq('id', data.kategoriProduk.id.longValue())
+                }
+                order('indeks', 'desc')
+                projections {
+                    property('indeks', 'indeks')
+                }
+            }
+            produk.indeks = indeks.size() > 0 ? indeks[0]['indeks'] + 1 : 1
+        } else {
+            produk.indeks = data.indeks
+        }
         produk.deskripsi = data.deskripsi
         produk.jumlahAwal = data.jumlahAwal
         produk.hargaBeliAwal = data.hargaBeliAwal
+        produk.kategoriProduk = KategoriProduk.get(data.kategoriProduk.id)
         produk.satuan = Satuan.get(data.satuan.id)
         
         def response = [:]
@@ -129,6 +172,9 @@ class ProdukService {
     def count(params) {
         return Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            kategoriProduk {
+                eq('activeStatus', 'Y')
+            }
             satuan {
                 eq('activeStatus', 'Y')
             }

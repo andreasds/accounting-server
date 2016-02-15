@@ -1,20 +1,20 @@
 package com.andreas.accounting.administrator.daftarproduk
 
-class Satuan {
+class KategoriProduk {
 
+    String nama
     String kode
-    String deskripsi
     String activeStatus
 
     static constraints = {
-        deskripsi nullable: true
+        
     }
     
     static mapping = {
-        table 'unit'
+        table 'item_category'
         
-        kode length: 10
-        deskripsi length: 500
+        nama length: 50
+        kode length: 5
         activeStatus length: 1
     }
 }

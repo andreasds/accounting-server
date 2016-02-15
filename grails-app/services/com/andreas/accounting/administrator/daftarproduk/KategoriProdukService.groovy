@@ -1,27 +1,27 @@
 package com.andreas.accounting.administrator.daftarproduk
 
-import com.andreas.accounting.administrator.daftarproduk.Satuan
+import com.andreas.accounting.administrator.daftarproduk.KategoriProduk
 import grails.converters.JSON
 import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
-class SatuanService {
+class KategoriProdukService {
     
     def listAll() {
-        return Satuan.withCriteria {
+        return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
+                property('nama', 'nama')
                 property('kode', 'kode')
-                property('deskripsi', 'deskripsi')
             }
         }
     }
     
     def list(params) {
-        return Satuan.withCriteria {
+        return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
             order(params.sort, params.order)
@@ -29,33 +29,33 @@ class SatuanService {
             firstResult(params.offset)
             projections {
                 property('id', 'id')
+                property('nama', 'nama')
                 property('kode', 'kode')
-                property('deskripsi', 'deskripsi')
             }
         }
     }
     
-    def listKode() {
-        return Satuan.withCriteria {
+    def listNama() {
+        return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
-                property('kode', 'kode')
+                property('nama', 'nama')
             }
         }
     }
 
     def save(data) {
-        def satuan = new Satuan()
-        satuan.kode = data.kode
-        satuan.deskripsi = data.deskripsi
-        satuan.activeStatus = 'Y'
+        def kategoriProduk = new KategoriProduk()
+        kategoriProduk.nama = data.nama
+        kategoriProduk.kode = data.kode
+        kategoriProduk.activeStatus = 'Y'
         
         def response = [:]
-        if (satuan.save(flush: true)) {
+        if (kategoriProduk.save(flush: true)) {
             response['message'] = 'succeed'
-            response['id'] = satuan.id
+            response['id'] = kategoriProduk.id
         } else {
             response['message'] = 'failed'
         }
@@ -63,27 +63,27 @@ class SatuanService {
     }
     
     def get(id) {
-        return Satuan.withCriteria {
+        return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('id', id)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
+                property('nama', 'nama')
                 property('kode', 'kode')
-                property('deskripsi', 'deskripsi')
             }
         }[0]
     }
     
     def update(id, data) {
-        def satuan = Satuan.get(id)
-        satuan.kode = data.kode
-        satuan.deskripsi = data.deskripsi
+        def kategoriProduk = KategoriProduk.get(id)
+        kategoriProduk.nama = data.nama
+        kategoriProduk.kode = data.kode
         
         def response = [:]
-        if (satuan.save(flush: true)) {
+        if (kategoriProduk.save(flush: true)) {
             response['message'] = 'succeed'
-            response['id'] = satuan.id
+            response['id'] = kategoriProduk.id
         } else {
             response['message'] = 'failed'
         }
@@ -91,11 +91,11 @@ class SatuanService {
     }
     
     def delete(id) {
-        def satuan = Satuan.get(id)
-        satuan.activeStatus = 'N'
+        def kategoriProduk = KategoriProduk.get(id)
+        kategoriProduk.activeStatus = 'N'
         
         def response = [:]
-        if (satuan.save(flush: true)) {
+        if (kategoriProduk.save(flush: true)) {
             response['message'] = 'succeed'
         } else {
             response['message'] = 'failed'
@@ -104,7 +104,7 @@ class SatuanService {
     }
     
     def count(params) {
-        return Satuan.withCriteria {
+        return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
         }.size()

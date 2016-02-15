@@ -4,13 +4,16 @@ import com.andreas.accounting.administrator.daftarproduk.Satuan
 
 class Produk {
 
-    String kode
+    int indeks
     String deskripsi
     int jumlahAwal
     int hargaBeliAwal
     String activeStatus
     
-    static belongsTo = [satuan: Satuan]
+    static belongsTo = [
+        kategoriProduk: KategoriProduk,
+        satuan: Satuan
+    ]
 
     static constraints = {
         
@@ -19,7 +22,6 @@ class Produk {
     static mapping = {
         table 'item'
         
-        kode length: 20
         deskripsi length: 150
         activeStatus length: 1
     }

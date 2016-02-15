@@ -81,6 +81,13 @@ class AdministratorService {
             parent: menuDaftarProduk,
             role: roleAdmin
         ).save(flush: true)
+        Menu menuKategori = Menu.findByNama('Kategori') ?: new Menu (
+            nama: 'Kategori',
+            path: '/modules/administrator/daftar-produk/kategori/list.xhtml',
+            icon: 'fa fa-tags',
+            parent: menuDaftarProduk,
+            role: roleUser
+        ).save(flush: true)
         Menu menuProduk = Menu.findByNama('Produk') ?: new Menu (
             nama: 'Produk',
             path: '/modules/administrator/daftar-produk/produk/list.xhtml',

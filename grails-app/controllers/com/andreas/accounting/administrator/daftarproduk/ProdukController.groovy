@@ -13,7 +13,7 @@ class ProdukController {
     def list() {
         params.offset = params.offset != 'null' ? params.int('offset') : 0
         params.max = params.max != 'null' ? params.int('max') : 10
-        params.sort = params.sort != 'null' ? params.sort : 'kode'
+        params.sort = params.sort != 'null' ? params.sort : 'indeks'
         params.order = params.order != 'null' ? params.order : 'asc'
         render produkService.list(params) as JSON
     }
