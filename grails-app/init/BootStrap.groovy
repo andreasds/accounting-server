@@ -8,7 +8,10 @@ class BootStrap {
     def init = { servletContext ->
         switch(Environment.current) {
         case Environment.DEVELOPMENT:
-            administratorService.init();
+            administratorService.init()
+            break
+        case Environment.TEST:
+            administratorService.init()
             break
         default:
             break

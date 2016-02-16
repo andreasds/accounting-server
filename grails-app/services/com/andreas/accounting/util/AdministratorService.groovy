@@ -104,8 +104,8 @@ class AdministratorService {
         ).save(flush: true)
         
         // data rekening
-        Menu menuDataRekening = Menu.findByNama('Rekening') ?: new Menu (
-            nama: 'Rekening',
+        Menu menuDataRekening = Menu.findByNama('Data Rekening') ?: new Menu (
+            nama: 'Data Rekening',
             path: '/modules/administrator/rekening/list.xhtml',
             icon: 'fa fa-university',
             parent: menuAdministrator,
