@@ -58,6 +58,7 @@ class KategoriProdukService {
             response['id'] = kategoriProduk.id
         } else {
             response['message'] = 'failed'
+            response['error'] = kategoriProduk.errors.allErrors.code
         }
         return response
     }
@@ -86,6 +87,7 @@ class KategoriProdukService {
             response['id'] = kategoriProduk.id
         } else {
             response['message'] = 'failed'
+            response['error'] = kategoriProduk.errors.allErrors.code
         }
         return response
     }

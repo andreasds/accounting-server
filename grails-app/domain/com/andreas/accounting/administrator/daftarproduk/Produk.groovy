@@ -16,7 +16,7 @@ class Produk {
     ]
 
     static constraints = {
-        
+        indeks unique: 'kategoriProduk'
     }
     
     static mapping = {

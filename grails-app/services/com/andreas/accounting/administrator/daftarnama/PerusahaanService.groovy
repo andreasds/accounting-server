@@ -61,6 +61,7 @@ class PerusahaanService {
             response['id'] = perusahaan.id
         } else {
             response['message'] = 'failed'
+            response['error'] = perusahaan.errors.allErrors.code
         }
         return response
     }
@@ -91,6 +92,7 @@ class PerusahaanService {
             response['id'] = perusahaan.id
         } else {
             response['message'] = 'failed'
+            response['error'] = perusahaan.errors.allErrors.code
         }
         return response
     }

@@ -13,6 +13,7 @@ class Orang {
     static belongsTo = [perusahaan: Perusahaan]
 
     static constraints = {
+        nama unique: 'perusahaan'
         telepon nullable: true
         hp nullable: true
     }

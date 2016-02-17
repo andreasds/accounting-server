@@ -7,6 +7,7 @@ class Satuan {
     String activeStatus
 
     static constraints = {
+        kode unique: true
         deskripsi nullable: true
     }
     

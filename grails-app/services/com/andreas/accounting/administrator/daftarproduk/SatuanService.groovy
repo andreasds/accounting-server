@@ -58,6 +58,7 @@ class SatuanService {
             response['id'] = satuan.id
         } else {
             response['message'] = 'failed'
+            response['error'] = satuan.errors.allErrors.code
         }
         return response
     }
@@ -86,6 +87,7 @@ class SatuanService {
             response['id'] = satuan.id
         } else {
             response['message'] = 'failed'
+            response['error'] = satuan.errors.allErrors.code
         }
         return response
     }

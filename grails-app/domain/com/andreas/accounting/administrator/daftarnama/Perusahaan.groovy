@@ -8,6 +8,7 @@ class Perusahaan {
     String activeStatus
 
     static constraints = {
+        nama unique: true
         alamat nullable: true
         kota nullable: true
     }

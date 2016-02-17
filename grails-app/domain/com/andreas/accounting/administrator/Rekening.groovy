@@ -8,6 +8,7 @@ class Rekening {
     String activeStatus
 
     static constraints = {
+        nama unique: true
         deskripsi nullable: true
     }
     

@@ -73,18 +73,8 @@ class ProdukService {
     }
 
     def save(data) {
-        def indeks = Produk.withCriteria {
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            kategoriProduk {
-                eq('id', data.kategoriProduk.id.longValue())
-            }
-            order('indeks', 'desc')
-            projections {
-                property('indeks', 'indeks')
-            }
-        }
         def produk = new Produk()
-        produk.indeks = indeks.size() > 0 ? indeks[0]['indeks'] + 1 : 1
+        produk.indeks = getLastIndex(data.kategoriProduk.id) + 1
         produk.deskripsi = data.deskripsi
         produk.jumlahAwal = 0
         produk.hargaBeliAwal = 0
@@ -98,8 +88,24 @@ class ProdukService {
             response['id'] = produk.id
         } else {
             response['message'] = 'failed'
+            response['error'] = produk.errors.allErrors.code
         }
         return response
+    }
+    
+    def getLastIndex(kategoriProdukId) {
+        def indeks = Produk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            kategoriProduk {
+                eq('id', kategoriProdukId.longValue())
+            }
+            order('indeks', 'desc')
+            maxResults(1)
+            projections {
+                property('indeks', 'indeks')
+            }
+        }
+        return indeks.size() > 0 ? indeks[0]['indeks'] : 0
     }
     
     def get(id) {
@@ -126,17 +132,7 @@ class ProdukService {
     def update(id, data) {
         def produk = Produk.get(id)
         if (produk.kategoriProduk.id != data.kategoriProduk.id) {
-            def indeks = Produk.withCriteria {
-                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-                kategoriProduk {
-                    eq('id', data.kategoriProduk.id.longValue())
-                }
-                order('indeks', 'desc')
-                projections {
-                    property('indeks', 'indeks')
-                }
-            }
-            produk.indeks = indeks.size() > 0 ? indeks[0]['indeks'] + 1 : 1
+            produk.indeks = getLastIndex(data.kategoriProduk.id) + 1
         } else {
             produk.indeks = data.indeks
         }
@@ -152,6 +148,7 @@ class ProdukService {
             response['id'] = produk.id
         } else {
             response['message'] = 'failed'
+            response['error'] = produk.errors.allErrors.code
         }
         return response
     }

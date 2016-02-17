@@ -59,6 +59,7 @@ class RekeningService {
             response['id'] = rekening.id
         } else {
             response['message'] = 'failed'
+            response['error'] = rekening.errors.allErrors.code
         }
         return response
     }
@@ -87,6 +88,7 @@ class RekeningService {
             response['id'] = rekening.id
         } else {
             response['message'] = 'failed'
+            response['error'] = rekening.errors.allErrors.code
         }
         return response
     }

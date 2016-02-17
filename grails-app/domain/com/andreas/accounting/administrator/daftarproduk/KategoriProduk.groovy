@@ -7,7 +7,8 @@ class KategoriProduk {
     String activeStatus
 
     static constraints = {
-        
+        nama unique: true
+        kode unique: true
     }
     
     static mapping = {

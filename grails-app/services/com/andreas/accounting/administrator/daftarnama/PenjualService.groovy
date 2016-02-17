@@ -78,6 +78,7 @@ class PenjualService {
             response['id'] = orang.id
         } else {
             response['message'] = 'failed'
+            response['error'] = orang.errors.allErrors.code
         }
         return response
     }
@@ -115,6 +116,7 @@ class PenjualService {
             response['id'] = orang.id
         } else {
             response['message'] = 'failed'
+            response['error'] = orang.errors.allErrors.code
         }
         return response
     }
