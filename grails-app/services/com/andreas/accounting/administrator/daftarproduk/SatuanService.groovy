@@ -66,7 +66,7 @@ class SatuanService {
     def get(id) {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            eq('id', id)
+            idEq(id)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
@@ -103,6 +103,13 @@ class SatuanService {
             response['message'] = 'failed'
         }
         return response
+    }
+    
+    def checkKode(kode) {
+        return Satuan.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq('kode', kode, [ignoreCase: true])
+        }.size()
     }
     
     def count(params) {

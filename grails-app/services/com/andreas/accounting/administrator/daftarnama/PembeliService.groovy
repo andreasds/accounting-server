@@ -89,7 +89,7 @@ class PembeliService {
             perusahaan {
                 eq('activeStatus', 'Y')
             }
-            eq('id', id)
+            idEq(id)
             eq('tipe', 'CUSTOMER')
             eq('activeStatus', 'Y')
             projections {
@@ -132,6 +132,17 @@ class PembeliService {
             response['message'] = 'failed'
         }
         return response
+    }
+    
+    def checkNama(nama, perusahaanId) {
+        return Orang.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                idEq(perusahaanId)
+            }
+            eq('tipe', 'CUSTOMER')
+            eq('nama', nama, [ignoreCase: true])
+        }.size()
     }
     
     def count(params) {

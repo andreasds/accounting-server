@@ -38,6 +38,10 @@ class PerusahaanController {
         render perusahaanService.delete(id) as JSON
     }
     
+    def checkNama(String nama) {
+        render perusahaanService.checkNama(nama)
+    }
+    
     def count() {
         render perusahaanService.count(params)
     }

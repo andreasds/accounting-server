@@ -67,7 +67,7 @@ class RekeningService {
     def get(id) {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            eq('id', id)
+            idEq(id)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
@@ -104,6 +104,13 @@ class RekeningService {
             response['message'] = 'failed'
         }
         return response
+    }
+    
+    def checkNama(nama) {
+        return Rekening.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq('nama', nama, [ignoreCase: true])
+        }.size()
     }
     
     def count(params) {

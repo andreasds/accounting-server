@@ -117,7 +117,7 @@ class ProdukService {
             satuan {
                 eq('activeStatus', 'Y')
             }
-            eq('id', id)
+            idEq(id)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')

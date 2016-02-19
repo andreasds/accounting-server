@@ -38,6 +38,14 @@ class KategoriProdukController {
         render kategoriProdukService.delete(id) as JSON
     }
     
+    def checkNama(String nama) {
+        render kategoriProdukService.checkNama(nama)
+    }
+    
+    def checkKode(String kode) {
+        render kategoriProdukService.checkKode(kode)
+    }
+    
     def count() {
         render kategoriProdukService.count(params)
     }

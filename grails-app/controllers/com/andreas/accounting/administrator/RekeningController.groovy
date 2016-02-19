@@ -38,6 +38,10 @@ class RekeningController {
         render rekeningService.delete(id) as JSON
     }
     
+    def checkNama(String nama) {
+        render rekeningService.checkNama(nama)
+    }
+    
     def count() {
         render rekeningService.count(params)
     }

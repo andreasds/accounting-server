@@ -38,6 +38,10 @@ class SatuanController {
         render satuanService.delete(id) as JSON
     }
     
+    def checkKode(String kode) {
+        render satuanService.checkKode(kode)
+    }
+    
     def count() {
         render satuanService.count(params)
     }

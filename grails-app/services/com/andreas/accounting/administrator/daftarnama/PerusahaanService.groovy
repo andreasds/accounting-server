@@ -69,7 +69,7 @@ class PerusahaanService {
     def get(id) {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            eq('id', id)
+            idEq(id)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
@@ -108,6 +108,13 @@ class PerusahaanService {
             response['message'] = 'failed'
         }
         return response
+    }
+    
+    def checkNama(nama) {
+        return Perusahaan.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq('nama', nama, [ignoreCase: true])
+        }.size()
     }
     
     def count(params) {

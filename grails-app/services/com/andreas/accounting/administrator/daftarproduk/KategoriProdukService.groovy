@@ -66,7 +66,7 @@ class KategoriProdukService {
     def get(id) {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            eq('id', id)
+            idEq(id)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
@@ -103,6 +103,20 @@ class KategoriProdukService {
             response['message'] = 'failed'
         }
         return response
+    }
+    
+    def checkNama(nama) {
+        return KategoriProduk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq('nama', nama, [ignoreCase: true])
+        }.size()
+    }
+    
+    def checkKode(kode) {
+        return KategoriProduk.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq('kode', kode, [ignoreCase: true])
+        }.size()
     }
     
     def count(params) {
