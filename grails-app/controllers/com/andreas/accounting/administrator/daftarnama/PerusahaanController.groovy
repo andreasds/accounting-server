@@ -21,6 +21,10 @@ class PerusahaanController {
     def listNama() {
         render perusahaanService.listNama() as JSON
     }
+
+    def listNamaPemilik() {
+        render perusahaanService.listNamaPemilik() as JSON
+    }
     
     def save() {
         render perusahaanService.save(request.JSON) as JSON

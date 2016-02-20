@@ -20,6 +20,7 @@ class Orang {
     
     static mapping = {
         table 'person'
+        version false
         
         tipe length: 10
         nama length: 100

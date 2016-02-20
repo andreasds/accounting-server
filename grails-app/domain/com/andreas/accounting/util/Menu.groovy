@@ -16,4 +16,8 @@ class Menu {
     static constraints = {
         parent blank: true, nullable: true
     }
+    
+    static mapping = {
+        version false
+    }
 }

@@ -14,6 +14,7 @@ class Rekening {
     
     static mapping = {
         table 'cash_account'
+        version false
         
         nama length: 100
         deskripsi length: 500

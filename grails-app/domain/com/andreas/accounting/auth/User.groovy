@@ -51,6 +51,8 @@ class User implements Serializable {
     }
     
     static mapping = {
+        version false
+        
         password column: '`password`'
     }
 }

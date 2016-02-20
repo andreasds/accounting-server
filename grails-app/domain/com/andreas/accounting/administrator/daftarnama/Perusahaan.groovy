@@ -5,6 +5,7 @@ class Perusahaan {
     String nama
     String alamat
     String kota
+    boolean pemilik
     String activeStatus
 
     static constraints = {
@@ -15,6 +16,7 @@ class Perusahaan {
     
     static mapping = {
         table 'company'
+        version false
         
         nama length: 100
         alamat length: 500

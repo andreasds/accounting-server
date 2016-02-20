@@ -21,6 +21,7 @@ class Produk {
     
     static mapping = {
         table 'item'
+        version false
         
         deskripsi length: 150
         activeStatus length: 1

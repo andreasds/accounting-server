@@ -40,6 +40,19 @@ class PerusahaanService {
     def listNama() {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq('pemilik', false)
+            eq('activeStatus', 'Y')
+            projections {
+                property('id', 'id')
+                property('nama', 'nama')
+            }
+        }
+    }
+    
+    def listNamaPemilik() {
+        return Perusahaan.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq('pemilik', true)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')
@@ -53,6 +66,7 @@ class PerusahaanService {
         perusahaan.nama = data.nama
         perusahaan.alamat = data.alamat
         perusahaan.kota = data.kota
+        perusahaan.pemilik = data.pemilik
         perusahaan.activeStatus = 'Y'
         
         def response = [:]
@@ -85,6 +99,7 @@ class PerusahaanService {
         perusahaan.nama = data.nama
         perusahaan.alamat = data.alamat
         perusahaan.kota = data.kota
+        perusahaan.pemilik = data.pemilik
         
         def response = [:]
         if (perusahaan.save(flush: true)) {
