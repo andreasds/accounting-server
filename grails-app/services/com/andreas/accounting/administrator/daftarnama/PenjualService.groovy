@@ -17,6 +17,7 @@ class PenjualService {
             }
             eq('tipe', 'VENDOR')
             eq('activeStatus', 'Y')
+            order('nama', 'asc')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
@@ -56,6 +57,7 @@ class PenjualService {
             }
             eq('tipe', 'VENDOR')
             eq('activeStatus', 'Y')
+            order('nama', 'asc')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')

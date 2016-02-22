@@ -12,6 +12,7 @@ class KategoriProdukService {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
+            order('nama', 'asc')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
@@ -39,6 +40,7 @@ class KategoriProdukService {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
+            order('nama', 'asc')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')

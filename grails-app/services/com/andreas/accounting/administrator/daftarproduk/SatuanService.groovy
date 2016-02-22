@@ -12,6 +12,7 @@ class SatuanService {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
+            order('kode', 'asc')
             projections {
                 property('id', 'id')
                 property('kode', 'kode')
@@ -39,6 +40,7 @@ class SatuanService {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
+            order('kode', 'asc')
             projections {
                 property('id', 'id')
                 property('kode', 'kode')

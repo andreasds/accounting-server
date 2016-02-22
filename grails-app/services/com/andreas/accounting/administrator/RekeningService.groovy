@@ -12,6 +12,7 @@ class RekeningService {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
+            order('nama', 'asc')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
@@ -39,6 +40,7 @@ class RekeningService {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
+            order('nama', 'asc')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')

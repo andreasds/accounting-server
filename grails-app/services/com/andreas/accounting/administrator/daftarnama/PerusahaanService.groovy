@@ -12,6 +12,7 @@ class PerusahaanService {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('activeStatus', 'Y')
+            order('nama', 'asc')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
@@ -42,6 +43,7 @@ class PerusahaanService {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('pemilik', false)
             eq('activeStatus', 'Y')
+            order('nama', 'asc')
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
