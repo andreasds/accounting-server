@@ -4,7 +4,6 @@ class Rekening {
     
     String nama
     String deskripsi
-    int saldoAwal
     String activeStatus
 
     static constraints = {
@@ -15,6 +14,7 @@ class Rekening {
     static mapping = {
         table 'cash_account'
         version false
+        sort nama: 'asc'
         
         nama length: 100
         deskripsi length: 500

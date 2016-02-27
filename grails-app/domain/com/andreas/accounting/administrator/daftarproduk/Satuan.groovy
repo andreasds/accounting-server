@@ -14,6 +14,7 @@ class Satuan {
     static mapping = {
         table 'unit'
         version false
+        sort kode: 'asc'
         
         kode length: 10
         deskripsi length: 500

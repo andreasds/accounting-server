@@ -2,7 +2,6 @@ package com.andreas.accounting.administrator.daftarnama
 
 import com.andreas.accounting.administrator.daftarnama.Orang
 import com.andreas.accounting.administrator.daftarnama.Perusahaan
-import grails.converters.JSON
 import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 
@@ -29,7 +28,7 @@ class PenjualService {
     }
     
     def list(params) {
-        return Orang.withCriteria {
+        def orangs = Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
                 eq('activeStatus', 'Y')
@@ -47,6 +46,16 @@ class PenjualService {
                 property('perusahaan', 'perusahaan')
             }
         }
+        
+        if (!orangs.empty) {
+            orangs.each { orang ->
+                def perusahaan = [:]
+                perusahaan['id'] = orang['perusahaan']['id']
+                perusahaan['nama'] = orang['perusahaan']['nama']
+                orang['perusahaan'] = perusahaan
+            }
+        }
+        return orangs
     }
     
     def listNama() {
@@ -86,7 +95,7 @@ class PenjualService {
     }
     
     def get(id) {
-        return Orang.withCriteria {
+        def orang = Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
                 eq('activeStatus', 'Y')
@@ -101,7 +110,16 @@ class PenjualService {
                 property('hp', 'hp')
                 property('perusahaan', 'perusahaan')
             }
-        }[0]
+        }
+        
+        if (!orang.empty) {
+            orang = orang[0]
+            def perusahaan = [:]
+            perusahaan['id'] = orang['perusahaan']['id']
+            perusahaan['nama'] = orang['perusahaan']['nama']
+            orang['perusahaan'] = perusahaan
+        }
+        return orang
     }
     
     def update(id, data) {

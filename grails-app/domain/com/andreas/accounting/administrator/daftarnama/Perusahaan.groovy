@@ -17,6 +17,7 @@ class Perusahaan {
     static mapping = {
         table 'company'
         version false
+        sort nama: 'asc'
         
         nama length: 100
         alamat length: 500

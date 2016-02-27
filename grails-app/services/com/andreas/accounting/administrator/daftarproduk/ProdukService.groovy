@@ -3,7 +3,6 @@ package com.andreas.accounting.administrator.daftarproduk
 import com.andreas.accounting.administrator.daftarproduk.KategoriProduk
 import com.andreas.accounting.administrator.daftarproduk.Produk
 import com.andreas.accounting.administrator.daftarproduk.Satuan
-import grails.converters.JSON
 import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 
@@ -32,7 +31,7 @@ class ProdukService {
     }
     
     def list(params) {
-        return Produk.withCriteria {
+        def produks = Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             kategoriProduk {
                 eq('activeStatus', 'Y')
@@ -53,10 +52,26 @@ class ProdukService {
                 property('satuan', 'satuan')
             }
         }
+        
+        if (!produks.empty) {
+            produks.each { produk ->
+                def kategoriProduk = [:]
+                kategoriProduk['id'] = produk['kategoriProduk']['id']
+                kategoriProduk['nama'] = produk['kategoriProduk']['nama']
+                kategoriProduk['kode'] = produk['kategoriProduk']['kode']
+                produk['kategoriProduk'] = kategoriProduk
+                
+                def satuan = [:]
+                satuan['id'] = produk['satuan']['id']
+                satuan['kode'] = produk['satuan']['kode']
+                produk['satuan'] = satuan
+            }
+        }
+        return produks
     }
     
     def listKode() {
-        return Produk.withCriteria {
+        def produks = Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             kategoriProduk {
                 eq('activeStatus', 'Y')
@@ -73,14 +88,22 @@ class ProdukService {
                 property('kategoriProduk', 'kategoriProduk')
             }
         }
+        
+        if (!produks.empty) {
+            produks.each { produk ->
+                def kategoriProduk = [:]
+                kategoriProduk['id'] = produk['kategoriProduk']['id']
+                kategoriProduk['kode'] = produk['kategoriProduk']['kode']
+                produk['kategoriProduk'] = kategoriProduk
+            }
+        }
+        return produks
     }
 
     def save(data) {
         def produk = new Produk()
         produk.indeks = getLastIndex(data.kategoriProduk.id) + 1
         produk.deskripsi = data.deskripsi
-        produk.jumlahAwal = 0
-        produk.hargaBeliAwal = 0
         produk.activeStatus = 'Y'
         produk.kategoriProduk = KategoriProduk.get(data.kategoriProduk.id)
         produk.satuan = Satuan.get(data.satuan.id)
@@ -102,17 +125,15 @@ class ProdukService {
             kategoriProduk {
                 eq('id', kategoriProdukId.longValue())
             }
-            order('indeks', 'desc')
-            maxResults(1)
             projections {
-                property('indeks', 'indeks')
+                max('indeks', 'indeks')
             }
         }
-        return indeks.size() > 0 ? indeks[0]['indeks'] : 0
+        return indeks[0]['indeks'] != null ? indeks[0]['indeks'] : 0
     }
     
     def get(id) {
-        return Produk.withCriteria {
+        def produk = Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             kategoriProduk {
                 eq('activeStatus', 'Y')
@@ -129,7 +150,23 @@ class ProdukService {
                 property('kategoriProduk', 'kategoriProduk')
                 property('satuan', 'satuan')
             }
-        }[0]
+        }
+        
+        if (!produk.empty) {
+            produk = produk[0]
+            
+            def kategoriProduk = [:]
+            kategoriProduk['id'] = produk['kategoriProduk']['id']
+            kategoriProduk['nama'] = produk['kategoriProduk']['nama']
+            kategoriProduk['kode'] = produk['kategoriProduk']['kode']
+            produk['kategoriProduk'] = kategoriProduk
+                
+            def satuan = [:]
+            satuan['id'] = produk['satuan']['id']
+            satuan['kode'] = produk['satuan']['kode']
+            produk['satuan'] = satuan
+        }
+        return produk
     }
     
     def update(id, data) {
@@ -140,8 +177,6 @@ class ProdukService {
             produk.indeks = data.indeks
         }
         produk.deskripsi = data.deskripsi
-        produk.jumlahAwal = data.jumlahAwal
-        produk.hargaBeliAwal = data.hargaBeliAwal
         produk.kategoriProduk = KategoriProduk.get(data.kategoriProduk.id)
         produk.satuan = Satuan.get(data.satuan.id)
         

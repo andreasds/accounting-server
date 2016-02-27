@@ -1,7 +1,6 @@
 package com.andreas.accounting.administrator.daftarproduk
 
 import com.andreas.accounting.administrator.daftarproduk.KategoriProduk
-import grails.converters.JSON
 import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 

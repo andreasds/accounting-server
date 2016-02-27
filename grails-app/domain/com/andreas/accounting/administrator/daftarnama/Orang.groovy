@@ -21,6 +21,8 @@ class Orang {
     static mapping = {
         table 'person'
         version false
+        sort nama: 'asc'
+        perusahaan sort: 'nama', order: 'asc'
         
         tipe length: 10
         nama length: 100

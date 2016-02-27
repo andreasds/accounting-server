@@ -14,6 +14,7 @@ class KategoriProduk {
     static mapping = {
         table 'item_category'
         version false
+        sort nama: 'asc'
         
         nama length: 50
         kode length: 5

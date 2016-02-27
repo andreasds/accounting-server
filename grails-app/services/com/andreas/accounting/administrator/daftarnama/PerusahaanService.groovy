@@ -1,7 +1,6 @@
 package com.andreas.accounting.administrator.daftarnama
 
 import com.andreas.accounting.administrator.daftarnama.Perusahaan
-import grails.converters.JSON
 import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 

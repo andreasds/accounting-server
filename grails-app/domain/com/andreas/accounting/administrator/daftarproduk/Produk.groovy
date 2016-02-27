@@ -6,8 +6,6 @@ class Produk {
 
     int indeks
     String deskripsi
-    int jumlahAwal
-    int hargaBeliAwal
     String activeStatus
     
     static belongsTo = [
@@ -22,6 +20,9 @@ class Produk {
     static mapping = {
         table 'item'
         version false
+        sort deskripsi: 'asc'
+        kategoriProduk sort: 'nama', order: 'asc'
+        satuan sort: 'kode', order: 'asc'
         
         deskripsi length: 150
         activeStatus length: 1

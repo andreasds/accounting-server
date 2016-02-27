@@ -29,7 +29,7 @@ class PembeliService {
     }
     
     def list(params) {
-        return Orang.withCriteria {
+        def orangs = Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
                 eq('activeStatus', 'Y')
@@ -47,6 +47,16 @@ class PembeliService {
                 property('perusahaan', 'perusahaan')
             }
         }
+        
+        if (!orangs.empty) {
+            orangs.each { orang ->
+                def perusahaan = [:]
+                perusahaan['id'] = orang['perusahaan']['id']
+                perusahaan['nama'] = orang['perusahaan']['nama']
+                orang['perusahaan'] = perusahaan
+            }
+        }
+        return orangs
     }
     
     def listNama() {
@@ -86,7 +96,7 @@ class PembeliService {
     }
     
     def get(id) {
-        return Orang.withCriteria {
+        def orang = Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
                 eq('activeStatus', 'Y')
@@ -101,7 +111,16 @@ class PembeliService {
                 property('hp', 'hp')
                 property('perusahaan', 'perusahaan')
             }
-        }[0]
+        }
+        
+        if (!orang.empty) {
+            orang = orang[0]
+            def perusahaan = [:]
+            perusahaan['id'] = orang['perusahaan']['id']
+            perusahaan['nama'] = orang['perusahaan']['nama']
+            orang['perusahaan'] = perusahaan
+        }
+        return orang
     }
     
     def update(id, data) {
