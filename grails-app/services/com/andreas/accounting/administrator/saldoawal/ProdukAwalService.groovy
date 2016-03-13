@@ -223,7 +223,7 @@ class ProdukAwalService {
     }
     
     def getTotal(perusahaanId) {
-        return ProdukAwal.withCriteria {
+        def total = ProdukAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
                 if (perusahaanId != 0) {
@@ -245,6 +245,7 @@ class ProdukAwalService {
                 sum('total', 'total')
             }
         }[0]['total']
+        return total != null ? total : 0
     }
         
     def count(params) {

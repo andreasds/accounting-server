@@ -7,7 +7,7 @@ import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class PenjualService {
-    
+
     def listAll() {
         return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -26,7 +26,7 @@ class PenjualService {
             }
         }
     }
-    
+
     def list(params) {
         def orangs = Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -46,7 +46,7 @@ class PenjualService {
                 property('perusahaan', 'perusahaan')
             }
         }
-        
+
         if (!orangs.empty) {
             orangs.each { orang ->
                 def perusahaan = [:]
@@ -57,9 +57,9 @@ class PenjualService {
         }
         return orangs
     }
-    
+
     def listNama() {
-        return Orang.withCriteria {
+        def orangs = Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
                 eq('activeStatus', 'Y')
@@ -70,8 +70,19 @@ class PenjualService {
             projections {
                 property('id', 'id')
                 property('nama', 'nama')
+                property('perusahaan', 'perusahaan')
             }
         }
+
+        if (!orangs.empty) {
+            orangs.each { orang ->
+                def perusahaan = [:]
+                perusahaan['id'] = orang['perusahaan']['id']
+                perusahaan['nama'] = orang['perusahaan']['nama']
+                orang['perusahaan'] = perusahaan
+            }
+        }
+        return orangs
     }
 
     def save(data) {
@@ -82,7 +93,7 @@ class PenjualService {
         orang.hp = data.hp
         orang.activeStatus = 'Y'
         orang.perusahaan = Perusahaan.get(data.perusahaan.id)
-        
+
         def response = [:]
         if (orang.save(flush: true)) {
             response['message'] = 'succeed'
@@ -93,7 +104,7 @@ class PenjualService {
         }
         return response
     }
-    
+
     def get(id) {
         def orang = Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -111,7 +122,7 @@ class PenjualService {
                 property('perusahaan', 'perusahaan')
             }
         }
-        
+
         if (!orang.empty) {
             orang = orang[0]
             def perusahaan = [:]
@@ -121,7 +132,7 @@ class PenjualService {
         }
         return orang
     }
-    
+
     def update(id, data) {
         def orang = Orang.get(id)
         orang.tipe = 'VENDOR'
@@ -129,7 +140,7 @@ class PenjualService {
         orang.telepon = data.telepon
         orang.hp = data.hp
         orang.perusahaan = Perusahaan.get(data.perusahaan.id)
-        
+
         def response = [:]
         if (orang.save(flush: true)) {
             response['message'] = 'succeed'
@@ -140,11 +151,11 @@ class PenjualService {
         }
         return response
     }
-    
+
     def delete(id) {
         def orang = Orang.get(id)
         orang.activeStatus = 'N'
-        
+
         def response = [:]
         if (orang.save(flush: true)) {
             response['message'] = 'succeed'
@@ -153,7 +164,7 @@ class PenjualService {
         }
         return response
     }
-    
+
     def checkNama(nama, perusahaanId) {
         return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -164,7 +175,7 @@ class PenjualService {
             eq('nama', nama, [ignoreCase: true])
         }.size()
     }
-    
+
     def count(params) {
         return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)

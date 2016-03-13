@@ -6,14 +6,15 @@ class BootStrap {
     def mataUangService
     
     def init = { servletContext ->
+        administratorService.init()
+        mataUangService.init()
+        
         switch(Environment.current) {
         case Environment.DEVELOPMENT:
-            administratorService.init()
-            mataUangService.init()
             break
         case Environment.TEST:
-            administratorService.init()
-            mataUangService.init()
+            break
+        case Environment.PRODUCTION:
             break
         default:
             break
