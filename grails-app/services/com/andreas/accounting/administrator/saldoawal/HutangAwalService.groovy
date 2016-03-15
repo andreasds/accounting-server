@@ -147,6 +147,7 @@ class HutangAwalService {
                 eq('activeStatus', 'Y')
                 order('tanggal', 'asc')
             }
+            idEq(id)
             eq('activeStatus', 'Y')
             projections {
                 property('id', 'id')

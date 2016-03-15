@@ -6,7 +6,7 @@ import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class RekeningService {
-    
+
     def listAll() {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -19,7 +19,7 @@ class RekeningService {
             }
         }
     }
-    
+
     def list(params) {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -34,7 +34,7 @@ class RekeningService {
             }
         }
     }
-    
+
     def listNama() {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -51,9 +51,8 @@ class RekeningService {
         def rekening = new Rekening()
         rekening.nama = data.nama
         rekening.deskripsi = data.deskripsi
-        rekening.saldoAwal = 0
         rekening.activeStatus = 'Y'
-        
+
         def response = [:]
         if (rekening.save(flush: true)) {
             response['message'] = 'succeed'
@@ -64,7 +63,7 @@ class RekeningService {
         }
         return response
     }
-    
+
     def get(id) {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -77,12 +76,12 @@ class RekeningService {
             }
         }[0]
     }
-    
+
     def update(id, data) {
         def rekening = Rekening.get(id)
         rekening.nama = data.nama
         rekening.deskripsi = data.deskripsi
-        
+
         def response = [:]
         if (rekening.save(flush: true)) {
             response['message'] = 'succeed'
@@ -93,11 +92,11 @@ class RekeningService {
         }
         return response
     }
-    
+
     def delete(id) {
         def rekening = Rekening.get(id)
         rekening.activeStatus = 'N'
-        
+
         def response = [:]
         if (rekening.save(flush: true)) {
             response['message'] = 'succeed'
@@ -106,14 +105,14 @@ class RekeningService {
         }
         return response
     }
-    
+
     def checkNama(nama) {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('nama', nama, [ignoreCase: true])
         }.size()
     }
-    
+
     def count(params) {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
