@@ -6,7 +6,7 @@ import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class SatuanService {
-    
+
     def listAll() {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -19,10 +19,19 @@ class SatuanService {
             }
         }
     }
-    
-    def list(params) {
+
+    def list(params, data) {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (data.containsKey('kode')) {
+                ilike('kode', "%${data['kode']}%")
+            }
+
+            if (data.containsKey('deskripsi')) {
+                ilike('deskripsi', "%${data['deskripsi']}%")
+            }
+
             eq('activeStatus', 'Y')
             order(params.sort, params.order)
             maxResults(params.max)
@@ -34,7 +43,7 @@ class SatuanService {
             }
         }
     }
-    
+
     def listKode() {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -52,7 +61,7 @@ class SatuanService {
         satuan.kode = data.kode
         satuan.deskripsi = data.deskripsi
         satuan.activeStatus = 'Y'
-        
+
         def response = [:]
         if (satuan.save(flush: true)) {
             response['message'] = 'succeed'
@@ -63,7 +72,7 @@ class SatuanService {
         }
         return response
     }
-    
+
     def get(id) {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -76,12 +85,12 @@ class SatuanService {
             }
         }[0]
     }
-    
+
     def update(id, data) {
         def satuan = Satuan.get(id)
         satuan.kode = data.kode
         satuan.deskripsi = data.deskripsi
-        
+
         def response = [:]
         if (satuan.save(flush: true)) {
             response['message'] = 'succeed'
@@ -92,11 +101,11 @@ class SatuanService {
         }
         return response
     }
-    
+
     def delete(id) {
         def satuan = Satuan.get(id)
         satuan.activeStatus = 'N'
-        
+
         def response = [:]
         if (satuan.save(flush: true)) {
             response['message'] = 'succeed'
@@ -105,17 +114,26 @@ class SatuanService {
         }
         return response
     }
-    
+
     def checkKode(kode) {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('kode', kode, [ignoreCase: true])
         }.size()
     }
-    
-    def count(params) {
+
+    def count(params, data) {
         return Satuan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (data.containsKey('kode')) {
+                ilike('kode', "%${data['kode']}%")
+            }
+
+            if (data.containsKey('deskripsi')) {
+                ilike('deskripsi', "%${data['deskripsi']}%")
+            }
+
             eq('activeStatus', 'Y')
         }.size()
     }

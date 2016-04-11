@@ -28,15 +28,38 @@ class PembeliService {
         }
     }
 
-    def list(params) {
+    def list(params, data) {
         def orangs = Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
+                if (data.containsKey('perusahaan.nama')) {
+                    ilike('nama', "%${data['perusahaan.nama']}%")
+                }
+
                 eq('activeStatus', 'Y')
+
+                if (params.sort == 'perusahaan.nama') {
+                    order('nama', params.order)
+                }
             }
+
+            if (data.containsKey('nama')) {
+                ilike('nama', "%${data['nama']}%")
+            }
+
+            if (data.containsKey('telepon')) {
+                ilike('telepon', "%${data['telepon']}%")
+            }
+
+            if (data.containsKey('hp')) {
+                ilike('hp', "%${data['hp']}%")
+            }
+
             eq('tipe', 'CUSTOMER')
             eq('activeStatus', 'Y')
-            order(params.sort, params.order)
+            if (params.sort != 'perusahaan.nama') {
+                order(params.sort, params.order)
+            }
             maxResults(params.max)
             firstResult(params.offset)
             projections {
@@ -177,12 +200,28 @@ class PembeliService {
         }.size()
     }
 
-    def count(params) {
+    def count(params, data) {
         return Orang.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
+                if (data.containsKey('perusahaan.nama')) {
+                    ilike('nama', "%${data['perusahaan.nama']}%")
+                }
                 eq('activeStatus', 'Y')
             }
+
+            if (data.containsKey('nama')) {
+                ilike('nama', "%${data['nama']}%")
+            }
+
+            if (data.containsKey('telepon')) {
+                ilike('telepon', "%${data['telepon']}%")
+            }
+
+            if (data.containsKey('hp')) {
+                ilike('hp', "%${data['hp']}%")
+            }
+
             eq('tipe', 'CUSTOMER')
             eq('activeStatus', 'Y')
         }.size()

@@ -9,13 +9,18 @@ class PiutangAwalController {
     def index() {
         render piutangAwalService.listAll() as JSON
     }
-    
+
     def list() {
         params.offset = params.offset != 'null' ? params.int('offset') : 0
         params.max = params.max != 'null' ? params.int('max') : 10
-        params.sort = params.sort != 'null' ? params.sort : 'jumlah'
-        params.order = params.order != 'null' ? params.order : 'asc'
-        render piutangAwalService.list(params) as JSON
+        params.sort = params.sort != 'null' ? params.sort : 'total'
+        params.order = params.order != 'null' ? params.order : 'desc'
+
+        if (request.JSON['perusahaanId'] != 0) {
+            render piutangAwalService.listByPerusahaan(params, request.JSON) as JSON
+        } else {
+            render piutangAwalService.list(params, request.JSON) as JSON
+        }
     }
 
     def save() {
@@ -38,11 +43,19 @@ class PiutangAwalController {
         render piutangAwalService.checkNo(no, perusahaanId)
     }
 
-    def getTotal(long perusahaanId) {
-        render piutangAwalService.getTotal(perusahaanId)
+    def getTotal(long perusahaanId, long pemilikId) {
+        if (perusahaanId != 0) {
+            render piutangAwalService.getTotalByPerusahaan(perusahaanId, pemilikId)
+        } else {
+            render piutangAwalService.getTotal(pemilikId)
+        }
     }
 
     def count() {
-        render piutangAwalService.count(params)
+        if (request.JSON['perusahaanId'] != 0) {
+            render piutangAwalService.countByPerusahaan(params, request.JSON)
+        } else {
+            render piutangAwalService.count(params, request.JSON)
+        }
     }
 }

@@ -29,18 +29,35 @@ class RekeningAwalService {
         }
     }
 
-    def list(params) {
+    def list(params, data) {
         def rekeningAwals = RekeningAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
+                if (data.containsKey('perusahaan.id')) {
+                    idEq(data['perusahaan.id'])
+                }
                 eq('activeStatus', 'Y')
-                order('nama', 'asc')
             }
             rekening {
+                if (data.containsKey('rekening.nama')) {
+                    ilike('nama', "%${data['rekening.nama']}%")
+                }
+
                 eq('activeStatus', 'Y')
+
+                if (params.sort == 'rekening.nama') {
+                    order('nama', params.order)
+                }
             }
+
+            if (data.containsKey('saldo')) {
+                le('saldo', new BigDecimal(data['saldo']))
+            }
+
             eq('activeStatus', 'Y')
-            order(params.sort, params.order)
+            if (params.sort == 'saldo') {
+                order(params.sort, params.order)
+            }
             maxResults(params.max)
             firstResult(params.offset)
             projections {
@@ -112,7 +129,7 @@ class RekeningAwalService {
             perusahaan['id'] = rekeningAwal['perusahaan']['id']
             perusahaan['nama'] = rekeningAwal['perusahaan']['nama']
             rekeningAwal['perusahaan'] = perusahaan
-                
+
             def rekening = [:]
             rekening['id'] = rekeningAwal['rekening']['id']
             rekening['nama'] = rekeningAwal['rekening']['nama']
@@ -183,14 +200,23 @@ class RekeningAwalService {
         return total != null ? total : 0
     }
 
-    def count(params) {
+    def count(params, data) {
         return RekeningAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
+                if (data.containsKey('perusahaan.id')) {
+                    idEq(data['perusahaan.id'])
+                }
                 eq('activeStatus', 'Y')
             }
             rekening {
+                if (data.containsKey('rekening.nama')) {
+                    ilike('nama', "%${data['rekening.nama']}%")
+                }
                 eq('activeStatus', 'Y')
+            }
+            if (data.containsKey('saldo')) {
+                le('saldo', new BigDecimal(data['saldo']))
             }
             eq('activeStatus', 'Y')
         }.size()

@@ -8,7 +8,7 @@ import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class ProdukService {
-    
+
     def listAll() {
         return Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -29,19 +29,49 @@ class ProdukService {
             }
         }
     }
-    
-    def list(params) {
+
+    def list(params, data) {
         def produks = Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             kategoriProduk {
+                if (data.containsKey('kategoriProduk.nama')) {
+                    ilike('nama', "%${data['kategoriProduk.nama']}%")
+                }
+
                 eq('activeStatus', 'Y')
-                order('kode', params.order)
+
+                if (params.sort == 'kategoriProduk.nama') {
+                    order('nama', params.order)
+                }
             }
             satuan {
+                if (data.containsKey('satuan.kode')) {
+                    ilike('kode', "%${data['satuan.kode']}%")
+                }
+
                 eq('activeStatus', 'Y')
+
+                if (params.sort == 'satuan.kode') {
+                    order('kode', params.order)
+                }
             }
+
+            if (data.containsKey('kode')) {
+                ilike('kode', "%${data['kode']}%")
+            }
+
+            if (data.containsKey('deskripsi')) {
+                ilike('deskripsi', "%${data['deskripsi']}%")
+            }
+
             eq('activeStatus', 'Y')
-            order(params.sort, params.order)
+            if (params.sort == 'deskripsi') {
+                order(params.sort, params.order)
+            }
+            kategoriProduk {
+                order('kode', params.order)
+            }
+            order('indeks', params.order)
             maxResults(params.max)
             firstResult(params.offset)
             projections {
@@ -52,7 +82,7 @@ class ProdukService {
                 property('satuan', 'satuan')
             }
         }
-        
+
         if (!produks.empty) {
             produks.each { produk ->
                 def kategoriProduk = [:]
@@ -60,7 +90,7 @@ class ProdukService {
                 kategoriProduk['nama'] = produk['kategoriProduk']['nama']
                 kategoriProduk['kode'] = produk['kategoriProduk']['kode']
                 produk['kategoriProduk'] = kategoriProduk
-                
+
                 def satuan = [:]
                 satuan['id'] = produk['satuan']['id']
                 satuan['kode'] = produk['satuan']['kode']
@@ -69,7 +99,7 @@ class ProdukService {
         }
         return produks
     }
-    
+
     def listKode() {
         def produks = Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -88,7 +118,7 @@ class ProdukService {
                 property('kategoriProduk', 'kategoriProduk')
             }
         }
-        
+
         if (!produks.empty) {
             produks.each { produk ->
                 def kategoriProduk = [:]
@@ -107,7 +137,7 @@ class ProdukService {
         produk.activeStatus = 'Y'
         produk.kategoriProduk = KategoriProduk.get(data.kategoriProduk.id)
         produk.satuan = Satuan.get(data.satuan.id)
-        
+
         def response = [:]
         if (produk.save(flush: true)) {
             response['message'] = 'succeed'
@@ -118,7 +148,7 @@ class ProdukService {
         }
         return response
     }
-    
+
     def getLastIndex(kategoriProdukId) {
         def indeks = Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -131,7 +161,7 @@ class ProdukService {
         }
         return indeks[0]['indeks'] != null ? indeks[0]['indeks'] : 0
     }
-    
+
     def get(id) {
         def produk = Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -151,16 +181,16 @@ class ProdukService {
                 property('satuan', 'satuan')
             }
         }
-        
+
         if (!produk.empty) {
             produk = produk[0]
-            
+
             def kategoriProduk = [:]
             kategoriProduk['id'] = produk['kategoriProduk']['id']
             kategoriProduk['nama'] = produk['kategoriProduk']['nama']
             kategoriProduk['kode'] = produk['kategoriProduk']['kode']
             produk['kategoriProduk'] = kategoriProduk
-                
+
             def satuan = [:]
             satuan['id'] = produk['satuan']['id']
             satuan['kode'] = produk['satuan']['kode']
@@ -168,7 +198,7 @@ class ProdukService {
         }
         return produk
     }
-    
+
     def update(id, data) {
         def produk = Produk.get(id)
         if (produk.kategoriProduk.id != data.kategoriProduk.id) {
@@ -179,7 +209,7 @@ class ProdukService {
         produk.deskripsi = data.deskripsi
         produk.kategoriProduk = KategoriProduk.get(data.kategoriProduk.id)
         produk.satuan = Satuan.get(data.satuan.id)
-        
+
         def response = [:]
         if (produk.save(flush: true)) {
             response['message'] = 'succeed'
@@ -190,11 +220,11 @@ class ProdukService {
         }
         return response
     }
-    
+
     def delete(id) {
         def produk = Produk.get(id)
         produk.activeStatus = 'N'
-        
+
         def response = [:]
         if (produk.save(flush: true)) {
             response['message'] = 'succeed'
@@ -203,16 +233,36 @@ class ProdukService {
         }
         return response
     }
-    
-    def count(params) {
+
+    def count(params, data) {
         return Produk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             kategoriProduk {
+                if (data.containsKey('kategoriProduk.nama')) {
+                    ilike('nama', "%${data['kategoriProduk.nama']}%")
+                }
+
+                if (data.containsKey('kategoriProduk.kode')) {
+                    ilike('kode', "%${data['kategoriProduk.kode']}%")
+                }
+
                 eq('activeStatus', 'Y')
             }
             satuan {
+                if (data.containsKey('satuan.kode')) {
+                    ilike('kode', "%${data['satuan.kode']}%")
+                }
                 eq('activeStatus', 'Y')
             }
+
+            if (data.containsKey('kode')) {
+                ilike('kode', "%${data['kode']}%")
+            }
+
+            if (data.containsKey('deskripsi')) {
+                ilike('deskripsi', "%${data['deskripsi']}%")
+            }
+
             eq('activeStatus', 'Y')
         }.size()
     }

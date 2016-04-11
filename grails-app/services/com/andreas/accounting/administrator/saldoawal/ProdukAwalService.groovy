@@ -9,7 +9,7 @@ import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class ProdukAwalService {
-    
+
     def listAll() {
         return ProdukAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -39,8 +39,8 @@ class ProdukAwalService {
             }
         }
     }
-    
-    def list(params) {
+
+    def list(params, data) {
         def produkAwals = ProdukAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {
@@ -69,25 +69,25 @@ class ProdukAwalService {
                 property('mataUang', 'mataUang')
             }
         }
-        
+
         if (!produkAwals.empty) {
             produkAwals.each { produkAwal ->
                 def perusahaan = [:]
                 perusahaan['id'] = produkAwal['perusahaan']['id']
                 perusahaan['nama'] = produkAwal['perusahaan']['nama']
                 produkAwal['perusahaan'] = perusahaan
-                
+
                 def produk = [:]
                 produk['id'] = produkAwal['produk']['id']
                 produk['indeks'] = produkAwal['produk']['indeks']
                 produk['deskripsi'] = produkAwal['produk']['deskripsi']
-                
+
                 def kategoriProduk = [:]
                 kategoriProduk['id'] = produkAwal['produk']['kategoriProduk']['id']
                 kategoriProduk['kode'] = produkAwal['produk']['kategoriProduk']['kode']
                 produk['kategoriProduk'] = kategoriProduk
                 produkAwal['produk'] = produk
-                
+
                 def mataUang = [:]
                 mataUang['id'] = produkAwal['mataUang']['id']
                 mataUang['kode'] = produkAwal['mataUang']['kode']
@@ -96,7 +96,7 @@ class ProdukAwalService {
         }
         return produkAwals
     }
-    
+
     def save(data) {
         def produkAwal = new ProdukAwal()
         produkAwal.jumlah = data.jumlah
@@ -107,7 +107,7 @@ class ProdukAwalService {
         produkAwal.perusahaan = Perusahaan.get(data.perusahaan.id)
         produkAwal.produk = Produk.get(data.produk.id)
         produkAwal.mataUang = MataUang.get(data.mataUang.id)
-        
+
         def response = [:]
         if (produkAwal.save(flush: true)) {
             response['message'] = 'succeed'
@@ -118,7 +118,7 @@ class ProdukAwalService {
         }
         return response
     }
-    
+
     def get(id) {
         def produkAwal = ProdukAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -147,26 +147,26 @@ class ProdukAwalService {
                 property('mataUang', 'mataUang')
             }
         }
-        
+
         if (!produkAwal.empty) {
             produkAwal = produkAwal[0]
-            
+
             def perusahaan = [:]
             perusahaan['id'] = produkAwal['perusahaan']['id']
             perusahaan['nama'] = produkAwal['perusahaan']['nama']
             produkAwal['perusahaan'] = perusahaan
-            
+
             def produk = [:]
             produk['id'] = produkAwal['produk']['id']
             produk['indeks'] = produkAwal['produk']['indeks']
             produk['deskripsi'] = produkAwal['produk']['deskripsi']
-                
+
             def kategoriProduk = [:]
             kategoriProduk['id'] = produkAwal['produk']['kategoriProduk']['id']
             kategoriProduk['kode'] = produkAwal['produk']['kategoriProduk']['kode']
             produk['kategoriProduk'] = kategoriProduk
             produkAwal['produk'] = produk
-                
+
             def mataUang = [:]
             mataUang['id'] = produkAwal['mataUang']['id']
             mataUang['nama'] = produkAwal['mataUang']['nama']
@@ -175,7 +175,7 @@ class ProdukAwalService {
         }
         return produkAwal
     }
-    
+
     def update(id, data) {
         def produkAwal = ProdukAwal.get(id)
         produkAwal.jumlah = data.jumlah
@@ -185,7 +185,7 @@ class ProdukAwalService {
         produkAwal.perusahaan = Perusahaan.get(data.perusahaan.id)
         produkAwal.produk = Produk.get(data.produk.id)
         produkAwal.mataUang = MataUang.get(data.mataUang.id)
-            
+
         def response = [:]
         if (produkAwal.save(flush: true)) {
             response['message'] = 'succeed'
@@ -196,11 +196,11 @@ class ProdukAwalService {
         }
         return response
     }
-        
+
     def delete(id) {
         def produkAwal = ProdukAwal.get(id)
         produkAwal.activeStatus = 'N'
-            
+
         def response = [:]
         if (produkAwal.save(flush: true)) {
             response['message'] = 'succeed'
@@ -209,7 +209,7 @@ class ProdukAwalService {
         }
         return response
     }
-    
+
     def checkProduk(produkId, perusahaanId) {
         return ProdukAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -221,7 +221,7 @@ class ProdukAwalService {
             }
         }.size()
     }
-    
+
     def getTotal(perusahaanId) {
         def total = ProdukAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -247,8 +247,8 @@ class ProdukAwalService {
         }[0]['total']
         return total != null ? total : 0
     }
-        
-    def count(params) {
+
+    def count(params, data) {
         return ProdukAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             perusahaan {

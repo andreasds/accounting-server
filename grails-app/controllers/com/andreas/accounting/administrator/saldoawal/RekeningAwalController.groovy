@@ -13,9 +13,9 @@ class RekeningAwalController {
     def list() {
         params.offset = params.offset != 'null' ? params.int('offset') : 0
         params.max = params.max != 'null' ? params.int('max') : 10
-        params.sort = params.sort != 'null' ? params.sort : 'saldo'
+        params.sort = params.sort != 'null' ? params.sort : 'rekening.nama'
         params.order = params.order != 'null' ? params.order : 'asc'
-        render rekeningAwalService.list(params) as JSON
+        render rekeningAwalService.list(params, request.JSON) as JSON
     }
 
     def save() {
@@ -43,6 +43,6 @@ class RekeningAwalController {
     }
 
     def count() {
-        render rekeningAwalService.count(params)
+        render rekeningAwalService.count(params, request.JSON)
     }
 }

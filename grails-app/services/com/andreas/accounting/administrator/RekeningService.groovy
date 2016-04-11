@@ -20,9 +20,18 @@ class RekeningService {
         }
     }
 
-    def list(params) {
+    def list(params, data) {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (data.containsKey('nama')) {
+                ilike('nama', "%${data['nama']}%")
+            }
+
+            if (data.containsKey('deskripsi')) {
+                ilike('deskripsi', "%${data['deskripsi']}%")
+            }
+
             eq('activeStatus', 'Y')
             order(params.sort, params.order)
             maxResults(params.max)
@@ -113,9 +122,18 @@ class RekeningService {
         }.size()
     }
 
-    def count(params) {
+    def count(params, data) {
         return Rekening.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (data.containsKey('nama')) {
+                ilike('nama', "%${data['nama']}%")
+            }
+
+            if (data.containsKey('deskripsi')) {
+                ilike('deskripsi', "%${data['deskripsi']}%")
+            }
+
             eq('activeStatus', 'Y')
         }.size()
     }

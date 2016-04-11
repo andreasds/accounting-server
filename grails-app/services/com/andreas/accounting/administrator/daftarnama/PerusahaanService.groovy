@@ -6,7 +6,7 @@ import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class PerusahaanService {
-    
+
     def listAll() {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -20,10 +20,23 @@ class PerusahaanService {
             }
         }
     }
-    
-    def list(params) {
+
+    def list(params, data) {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (data.containsKey('nama')) {
+                ilike('nama', "%${data['nama']}%")
+            }
+
+            if (data.containsKey('alamat')) {
+                ilike('alamat', "%${data['alamat']}%")
+            }
+
+            if (data.containsKey('kota')) {
+                ilike('kota', "%${data['kota']}%")
+            }
+
             eq('activeStatus', 'Y')
             order(params.sort, params.order)
             maxResults(params.max)
@@ -36,7 +49,7 @@ class PerusahaanService {
             }
         }
     }
-    
+
     def listNama() {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -49,7 +62,7 @@ class PerusahaanService {
             }
         }
     }
-    
+
     def listNamaPemilik() {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -69,7 +82,7 @@ class PerusahaanService {
         perusahaan.kota = data.kota
         perusahaan.pemilik = data.pemilik
         perusahaan.activeStatus = 'Y'
-        
+
         def response = [:]
         if (perusahaan.save(flush: true)) {
             response['message'] = 'succeed'
@@ -80,7 +93,7 @@ class PerusahaanService {
         }
         return response
     }
-    
+
     def get(id) {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -94,14 +107,14 @@ class PerusahaanService {
             }
         }[0]
     }
-    
+
     def update(id, data) {
         def perusahaan = Perusahaan.get(id)
         perusahaan.nama = data.nama
         perusahaan.alamat = data.alamat
         perusahaan.kota = data.kota
         perusahaan.pemilik = data.pemilik
-        
+
         def response = [:]
         if (perusahaan.save(flush: true)) {
             response['message'] = 'succeed'
@@ -112,11 +125,11 @@ class PerusahaanService {
         }
         return response
     }
-    
+
     def delete(id) {
         def perusahaan = Perusahaan.get(id)
         perusahaan.activeStatus = 'N'
-        
+
         def response = [:]
         if (perusahaan.save(flush: true)) {
             response['message'] = 'succeed'
@@ -125,17 +138,30 @@ class PerusahaanService {
         }
         return response
     }
-    
+
     def checkNama(nama) {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('nama', nama, [ignoreCase: true])
         }.size()
     }
-    
-    def count(params) {
+
+    def count(params, data) {
         return Perusahaan.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (data.containsKey('nama')) {
+                ilike('nama', "%${data['nama']}%")
+            }
+
+            if (data.containsKey('alamat')) {
+                ilike('alamat', "%${data['alamat']}%")
+            }
+
+            if (data.containsKey('kota')) {
+                ilike('kota', "%${data['kota']}%")
+            }
+
             eq('activeStatus', 'Y')
         }.size()
     }

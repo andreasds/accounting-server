@@ -40,26 +40,129 @@ class PiutangAwalService {
         }
     }
 
-    def list(params) {
+    def list(params, data) {
         def invoiceAwals = InvoiceAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             invoice {
                 perusahaan {
+                    if (data['pemilikId'] != 0) {
+                        idEq(data['pemilikId'].longValue())
+                    }
                     eq('activeStatus', 'Y')
-                    order('nama', 'asc')
                 }
                 orang {
                     perusahaan {
+                        if (data.containsKey('perusahaan.nama')) {
+                            ilike('nama', "%${data['perusahaan.nama']}%")
+                        }
+
                         eq('activeStatus', 'Y')
+
+                        if (params.sort == 'perusahaan.nama') {
+                            order('nama', params.order)
+                        }
                     }
                     eq('tipe', 'CUSTOMER')
                     eq('activeStatus', 'Y')
                 }
                 eq('activeStatus', 'Y')
-                order('tanggal', 'asc')
             }
+
+            if (data.containsKey('total')) {
+                le('jumlah', new BigDecimal(data['total']))
+            }
+
             eq('activeStatus', 'Y')
-            order(params.sort, params.order)
+            if (params.sort == 'total') {
+                order('jumlah', params.order)
+            }
+            maxResults(params.max)
+            firstResult(params.offset)
+            projections {
+                invoice {
+                    orang {
+                        perusahaan {
+                            property('id', 'id')
+                        }
+                        groupProperty('perusahaan', 'perusahaan')
+                    }
+                }
+                sum('total', 'jumlah')
+            }
+        }
+
+        if (!invoiceAwals.empty) {
+            invoiceAwals.each { invoiceAwal ->
+                def temp = Perusahaan.get(invoiceAwal['id'])
+
+                def perusahaan = [:]
+                perusahaan['id'] = temp.id
+                perusahaan['nama'] = temp.nama
+                invoiceAwal['perusahaan'] = perusahaan
+                invoiceAwal['rate'] = 1.0g
+            }
+        }
+        return invoiceAwals
+    }
+
+    def listByPerusahaan(params, data) {
+        def invoiceAwals = InvoiceAwal.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            invoice {
+                perusahaan {
+                    if (data['pemilikId'] != 0) {
+                        idEq(data['pemilikId'].longValue())
+                    }
+                    eq('activeStatus', 'Y')
+                }
+                orang {
+                    perusahaan {
+                        if (data.containsKey('perusahaan.nama')) {
+                            ilike('nama', "%${data['perusahaan.nama']}%")
+                        }
+
+                        if (data['perusahaanId'] != 0) {
+                            idEq(data['perusahaanId'].longValue())
+                        }
+
+                        eq('activeStatus', 'Y')
+
+                        if (params.sort == 'perusahaan.nama') {
+                            order('nama', params.order)
+                        }
+                    }
+                    eq('tipe', 'CUSTOMER')
+                    eq('activeStatus', 'Y')
+                }
+
+                if (data.containsKey('invoice.no')) {
+                    ilike('no', "%${data['invoice.no']}%")
+                }
+
+                if (data.containsKey('invoice.tanggal')) {
+                    def dateTemp = Date.parse('MMM dd, yyyy HH:mm:ss a', data['invoice.tanggal'])
+                    between('tanggal', dateTemp, dateTemp + 1)
+                }
+
+                eq('activeStatus', 'Y')
+
+                if (params.sort == 'invoice.no') {
+                    order('no', params.order)
+                }
+
+                if (params.sort == 'invoice.tanggal') {
+                    order('tanggal', params.order)
+                }
+            }
+
+            if (data.containsKey('total')) {
+                le('total', new BigDecimal(data['total']))
+            }
+
+            eq('activeStatus', 'Y')
+            if (params.sort == 'total') {
+                order('total', params.order)
+            }
             maxResults(params.max)
             firstResult(params.offset)
             projections {
@@ -255,13 +358,13 @@ class PiutangAwalService {
         }.size()
     }
 
-    def getTotal(perusahaanId) {
+    def getTotal(pemilikId) {
         def total = InvoiceAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             invoice {
                 perusahaan {
-                    if (perusahaanId != 0) {
-                        idEq(perusahaanId)
+                    if (pemilikId != 0) {
+                        idEq(pemilikId)
                     }
                     eq('activeStatus', 'Y')
                 }
@@ -282,15 +385,21 @@ class PiutangAwalService {
         return total != null ? total : 0
     }
 
-    def count(params) {
-        return InvoiceAwal.withCriteria {
+    def getTotalByPerusahaan(perusahaanId, pemilikId) {
+        def total = InvoiceAwal.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             invoice {
                 perusahaan {
+                    if (pemilikId != 0) {
+                        idEq(pemilikId)
+                    }
                     eq('activeStatus', 'Y')
                 }
                 orang {
                     perusahaan {
+                        if (perusahaanId != 0) {
+                            idEq(perusahaanId)
+                        }
                         eq('activeStatus', 'Y')
                     }
                     eq('tipe', 'CUSTOMER')
@@ -298,6 +407,95 @@ class PiutangAwalService {
                 }
                 eq('activeStatus', 'Y')
             }
+            eq('activeStatus', 'Y')
+            projections {
+                sum('total', 'total')
+            }
+        }[0]['total']
+        return total != null ? total : 0
+    }
+
+    def count(params, data) {
+        return InvoiceAwal.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            invoice {
+                perusahaan {
+                    if (data['pemilikId'] != 0) {
+                        idEq(data['pemilikId'].longValue())
+                    }
+                    eq('activeStatus', 'Y')
+                }
+                orang {
+                    perusahaan {
+                        if (data.containsKey('perusahaan.nama')) {
+                            ilike('nama', "%${data['perusahaan.nama']}%")
+                        }
+                        eq('activeStatus', 'Y')
+                    }
+                    eq('tipe', 'CUSTOMER')
+                    eq('activeStatus', 'Y')
+                }
+                eq('activeStatus', 'Y')
+            }
+
+            if (data.containsKey('total')) {
+                le('jumlah', new BigDecimal(data['total']))
+            }
+
+            eq('activeStatus', 'Y')
+            projections {
+                invoice {
+                    orang {
+                        groupProperty('perusahaan', 'perusahaan')
+                    }
+                }
+                sum('total', 'jumlah')
+            }
+        }.size()
+    }
+
+    def countByPerusahaan(params, data) {
+        return InvoiceAwal.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            invoice {
+                perusahaan {
+                    if (data['pemilikId'] != 0) {
+                        idEq(data['pemilikId'].longValue())
+                    }
+                    eq('activeStatus', 'Y')
+                }
+                orang {
+                    perusahaan {
+                        if (data.containsKey('perusahaan.nama')) {
+                            ilike('nama', "%${data['perusahaan.nama']}%")
+                        }
+
+                        if (data['perusahaanId'] != 0) {
+                            idEq(data['perusahaanId'].longValue())
+                        }
+
+                        eq('activeStatus', 'Y')
+                    }
+                    eq('tipe', 'CUSTOMER')
+                    eq('activeStatus', 'Y')
+                }
+
+                if (data.containsKey('invoice.no')) {
+                    ilike('no', "%${data['invoice.no']}%")
+                }
+
+                if (data.containsKey('invoice.tanggal')) {
+                    def dateTemp = Date.parse('MMM dd, yyyy HH:mm:ss a', data['invoice.tanggal'])
+                    between('tanggal', dateTemp, dateTemp + 1)
+                }
+
+                eq('activeStatus', 'Y')
+            }
+
+            if (data.containsKey('jumlah')) {
+                le('total', new BigDecimal(data['jumlah']))
+            }
+
             eq('activeStatus', 'Y')
         }.size()
     }

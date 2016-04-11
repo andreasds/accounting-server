@@ -6,7 +6,7 @@ import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class KategoriProdukService {
-    
+
     def listAll() {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -19,10 +19,19 @@ class KategoriProdukService {
             }
         }
     }
-    
-    def list(params) {
+
+    def list(params, data) {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (data.containsKey('nama')) {
+                ilike('nama', "%${data['nama']}%")
+            }
+
+            if (data.containsKey('kode')) {
+                ilike('kode', "%${data['kode']}%")
+            }
+
             eq('activeStatus', 'Y')
             order(params.sort, params.order)
             maxResults(params.max)
@@ -34,7 +43,7 @@ class KategoriProdukService {
             }
         }
     }
-    
+
     def listNama() {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -52,7 +61,7 @@ class KategoriProdukService {
         kategoriProduk.nama = data.nama
         kategoriProduk.kode = data.kode
         kategoriProduk.activeStatus = 'Y'
-        
+
         def response = [:]
         if (kategoriProduk.save(flush: true)) {
             response['message'] = 'succeed'
@@ -63,7 +72,7 @@ class KategoriProdukService {
         }
         return response
     }
-    
+
     def get(id) {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -76,12 +85,12 @@ class KategoriProdukService {
             }
         }[0]
     }
-    
+
     def update(id, data) {
         def kategoriProduk = KategoriProduk.get(id)
         kategoriProduk.nama = data.nama
         kategoriProduk.kode = data.kode
-        
+
         def response = [:]
         if (kategoriProduk.save(flush: true)) {
             response['message'] = 'succeed'
@@ -92,11 +101,11 @@ class KategoriProdukService {
         }
         return response
     }
-    
+
     def delete(id) {
         def kategoriProduk = KategoriProduk.get(id)
         kategoriProduk.activeStatus = 'N'
-        
+
         def response = [:]
         if (kategoriProduk.save(flush: true)) {
             response['message'] = 'succeed'
@@ -105,24 +114,33 @@ class KategoriProdukService {
         }
         return response
     }
-    
+
     def checkNama(nama) {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('nama', nama, [ignoreCase: true])
         }.size()
     }
-    
+
     def checkKode(kode) {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq('kode', kode, [ignoreCase: true])
         }.size()
     }
-    
-    def count(params) {
+
+    def count(params, data) {
         return KategoriProduk.withCriteria {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+
+            if (data.containsKey('nama')) {
+                ilike('nama', "%${data['nama']}%")
+            }
+
+            if (data.containsKey('kode')) {
+                ilike('kode', "%${data['kode']}%")
+            }
+
             eq('activeStatus', 'Y')
         }.size()
     }
