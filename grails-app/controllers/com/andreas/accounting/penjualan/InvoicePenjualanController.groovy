@@ -13,7 +13,7 @@ class InvoicePenjualanController {
     def list() {
         params.offset = params.offset != 'null' ? params.int('offset') : 0
         params.max = params.max != 'null' ? params.int('max') : 10
-        params.sort = params.sort != 'null' ? params.sort : 'total'
+        params.sort = params.sort != 'null' ? params.sort : 'tanggal'
         params.order = params.order != 'null' ? params.order : 'desc'
         render invoicePenjualanService.list(params, request.JSON) as JSON
     }
