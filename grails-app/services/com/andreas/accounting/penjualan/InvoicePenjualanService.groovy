@@ -37,23 +37,43 @@ class InvoicePenjualanService {
             }
             orang {
                 perusahaan {
-                    if (data.containsKey('perusahaan.nama')) {
-                        ilike('nama', "%${data['perusahaan.nama']}%")
+                    if (data.containsKey('orang.perusahaan.nama')) {
+                        ilike('nama', "%${data['orang.perusahaan.nama']}%")
                     }
 
                     eq('activeStatus', 'Y')
 
-                    if (params.sort == 'perusahaan.nama') {
+                    if (params.sort == 'orang.perusahaan.nama') {
                         order('nama', params.order)
                     }
                 }
                 eq('tipe', 'CUSTOMER')
                 eq('activeStatus', 'Y')
             }
+
             not {
                 'in'('id', invoiceAwals)
             }
+
+            if (data.containsKey('no')) {
+                ilike('no', "%${data['no']}%")
+            }
+
+            if (data.containsKey('tanggal')) {
+                def dateTemp = Date.parse('MMM dd, yyyy HH:mm:ss a', data['tanggal'])
+                between('tanggal', dateTemp, dateTemp + 1)
+            }
+
             eq('activeStatus', 'Y')
+
+            if (params.sort == 'no') {
+                order('no', params.order)
+            }
+
+            if (params.sort == 'tanggal') {
+                order('tanggal', params.order)
+            }
+
             maxResults(params.max)
             firstResult(params.offset)
             projections {
@@ -65,15 +85,39 @@ class InvoicePenjualanService {
         }
 
         if (!invoices.empty) {
-            invoices.each { invoice ->
+            invoices.each { invoiceModel ->
                 def perusahaan = [:]
-                perusahaan['id'] = invoice['orang']['perusahaan']['id']
-                perusahaan['nama'] = invoice['orang']['perusahaan']['nama']
+                perusahaan['id'] = invoiceModel['orang']['perusahaan']['id']
+                perusahaan['nama'] = invoiceModel['orang']['perusahaan']['nama']
 
                 def orang = [:]
-                orang['id'] = invoice['orang']['id']
+                orang['id'] = invoiceModel['orang']['id']
                 orang['perusahaan'] = perusahaan
-                invoice['orang'] = orang
+                invoiceModel['orang'] = orang
+
+                def produkInvoices = ProdukInvoice.withCriteria {
+                    resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                    invoice {
+                        idEq(invoiceModel['id'])
+                        eq('activeStatus', 'Y')
+                    }
+                    produk {
+                        kategoriProduk {
+                            eq('activeStatus', 'Y')
+                        }
+                        satuan {
+                            eq('activeStatus', 'Y')
+                        }
+                        eq('activeStatus', 'Y')
+                    }
+                    projections {
+                        property('id', 'id')
+                        property('jumlah', 'jumlah')
+                        property('harga', 'harga')
+                        property('rate', 'rate')
+                    }
+                }
+                invoiceModel['produkInvoices'] = produkInvoices
             }
         }
         return invoices
@@ -114,7 +158,92 @@ class InvoicePenjualanService {
     }
 
     def get(id) {
+        def invoiceModel = Invoice.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                eq('activeStatus', 'Y')
+            }
+            orang {
+                perusahaan {
+                    eq('activeStatus', 'Y')
+                }
+                eq('tipe', 'CUSTOMER')
+                eq('activeStatus', 'Y')
+            }
+            idEq(id)
+            eq('activeStatus', 'Y')
+            projections {
+                property('id', 'id')
+                property('no', 'no')
+                property('tanggal', 'tanggal')
+                property('perusahaan', 'perusahaan')
+                property('orang', 'orang')
+            }
+        }
 
+        if (!invoiceModel.empty) {
+            invoiceModel = invoiceModel[0]
+
+            def perusahaan = [:]
+            perusahaan['id'] = invoiceModel['perusahaan']['id']
+            perusahaan['nama'] = invoiceModel['perusahaan']['nama']
+            invoiceModel['perusahaan'] = perusahaan
+
+            def orang = [:]
+            orang['id'] = invoiceModel['orang']['id']
+            orang['nama'] = invoiceModel['orang']['nama']
+
+            perusahaan = [:]
+            perusahaan['id'] = invoiceModel['orang']['perusahaan']['id']
+            perusahaan['nama'] = invoiceModel['orang']['perusahaan']['nama']
+            orang['perusahaan'] = perusahaan
+            invoiceModel['orang'] = orang
+
+            def produkInvoices = ProdukInvoice.withCriteria {
+                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                invoice {
+                    idEq(invoiceModel['id'])
+                    eq('activeStatus', 'Y')
+                }
+                produk {
+                    kategoriProduk {
+                        eq('activeStatus', 'Y')
+                    }
+                    satuan {
+                        eq('activeStatus', 'Y')
+                    }
+                    eq('activeStatus', 'Y')
+                }
+                projections {
+                    property('id', 'id')
+                    property('jumlah', 'jumlah')
+                    property('harga', 'harga')
+                    property('rate', 'rate')
+                    property('produk', 'produk')
+                    property('mataUang', 'mataUang')
+                }
+            }
+
+            produkInvoices.each { produkInvoice ->
+                def produk = [:]
+                produk['id'] = produkInvoice['produk']['id']
+                produk['indeks'] = produkInvoice['produk']['indeks']
+                produk['deskripsi'] = produkInvoice['produk']['deskripsi']
+
+                def kategoriProduk = [:]
+                kategoriProduk['id'] = produkInvoice['produk']['kategoriProduk']['id']
+                kategoriProduk['kode'] = produkInvoice['produk']['kategoriProduk']['kode']
+                produk['kategoriProduk'] = kategoriProduk
+                produkInvoice['produk'] = produk
+
+                def mataUang = [:]
+                mataUang['id'] = produkInvoice['mataUang']['id']
+                mataUang['kode'] = produkInvoice['mataUang']['kode']
+                produkInvoice['mataUang'] = mataUang
+            }
+            invoiceModel['produkInvoices'] = produkInvoices
+        }
+        return invoiceModel
     }
 
     def update(id, data) {
@@ -139,6 +268,49 @@ class InvoicePenjualanService {
     }
 
     def count(params, data) {
-        return 1
+        def invoiceAwals = InvoiceAwal.withCriteria {
+            eq('activeStatus', 'Y')
+            projections {
+                invoice {
+                    property('id')
+                }
+            }
+        }
+
+        return Invoice.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                if (data['pemilikId'] != 0) {
+                    idEq(data['pemilikId'].longValue())
+                }
+                eq('activeStatus', 'Y')
+            }
+            orang {
+                perusahaan {
+                    if (data.containsKey('orang.perusahaan.nama')) {
+                        ilike('nama', "%${data['orang.perusahaan.nama']}%")
+                    }
+
+                    eq('activeStatus', 'Y')
+                }
+                eq('tipe', 'CUSTOMER')
+                eq('activeStatus', 'Y')
+            }
+
+            not {
+                'in'('id', invoiceAwals)
+            }
+
+            if (data.containsKey('no')) {
+                ilike('no', "%${data['no']}%")
+            }
+
+            if (data.containsKey('tanggal')) {
+                def dateTemp = Date.parse('MMM dd, yyyy HH:mm:ss a', data['tanggal'])
+                between('tanggal', dateTemp, dateTemp + 1)
+            }
+
+            eq('activeStatus', 'Y')
+        }.size()
     }
 }

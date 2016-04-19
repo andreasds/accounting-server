@@ -238,7 +238,6 @@ class PiutangAwalService {
             invoice {
                 perusahaan {
                     eq('activeStatus', 'Y')
-                    order('nama', 'asc')
                 }
                 orang {
                     perusahaan {
@@ -248,7 +247,6 @@ class PiutangAwalService {
                     eq('activeStatus', 'Y')
                 }
                 eq('activeStatus', 'Y')
-                order('tanggal', 'asc')
             }
             idEq(id)
             eq('activeStatus', 'Y')
