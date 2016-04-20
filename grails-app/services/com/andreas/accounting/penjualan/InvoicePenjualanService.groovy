@@ -14,7 +14,72 @@ import org.hibernate.criterion.CriteriaSpecification
 class InvoicePenjualanService {
 
     def listAll() {
+        def invoiceAwals = InvoiceAwal.withCriteria {
+            eq('activeStatus', 'Y')
+            projections {
+                invoice {
+                    property('id')
+                }
+            }
+        }
 
+        def invoices = Invoice.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            perusahaan {
+                eq('activeStatus', 'Y')
+            }
+            orang {
+                perusahaan {
+                    eq('activeStatus', 'Y')
+                }
+                eq('tipe', 'CUSTOMER')
+                eq('activeStatus', 'Y')
+            }
+
+            not {
+                'in'('id', invoiceAwals)
+            }
+            eq('activeStatus', 'Y')
+            order('tanggal', 'desc')
+            projections {
+                property('id', 'id')
+                property('no', 'no')
+                property('tanggal', 'tanggal')
+                property('perusahaan', 'perusahaan')
+                property('orang', 'orang')
+            }
+        }
+
+        if (!invoices.empty) {
+            invoices.each { invoiceModel ->
+                def produkInvoices = ProdukInvoice.withCriteria {
+                    resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                    invoice {
+                        idEq(invoiceModel['id'])
+                        eq('activeStatus', 'Y')
+                    }
+                    produk {
+                        kategoriProduk {
+                            eq('activeStatus', 'Y')
+                        }
+                        satuan {
+                            eq('activeStatus', 'Y')
+                        }
+                        eq('activeStatus', 'Y')
+                    }
+                    projections {
+                        property('id', 'id')
+                        property('jumlah', 'jumlah')
+                        property('harga', 'harga')
+                        property('rate', 'rate')
+                        property('produk', 'produk')
+                        property('mataUang', 'mataUang')
+                    }
+                }
+                invoiceModel['produkInvoices'] = produkInvoices
+            }
+        }
+        return invoices
     }
 
     def list(params, data) {
@@ -247,11 +312,59 @@ class InvoicePenjualanService {
     }
 
     def update(id, data) {
+        def invoice = Invoice.get(id)
+        invoice.no = data.no
+        invoice.tanggal = Date.parse('MMM dd, yyyy HH:mm:ss a', data.tanggal)
+        invoice.perusahaan = Perusahaan.get(data.perusahaan.id)
+        invoice.orang = Orang.get(data.orang.id)
 
+        def response = [:]
+        if (invoice.save(flush: true)) {
+            data.produkInvoices.each { temp ->
+                def produkInvoice = temp.id == 0 ? new ProdukInvoice() : ProdukInvoice.get(temp.id)
+                produkInvoice.jumlah = temp.jumlah
+                produkInvoice.harga = temp.harga
+                produkInvoice.rate = temp.rate
+                produkInvoice.invoice = invoice
+                produkInvoice.produk = Produk.get(temp.produk.id)
+                produkInvoice.mataUang = MataUang.get(temp.mataUang.id)
+
+                if (temp.removed) {
+                    if (produkInvoice.delete(flush: true)) {
+                        response['message'] = 'succeed'
+                        response['id'] = invoice.id
+                    } else {
+                        response['message'] = 'failed'
+                        response['error'] = produkInvoice.errors.allErrors.code
+                    }
+                } else {
+                    if (produkInvoice.save(flush: true)) {
+                        response['message'] = 'succeed'
+                        response['id'] = invoice.id
+                    } else {
+                        response['message'] = 'failed'
+                        response['error'] = produkInvoice.errors.allErrors.code
+                    }
+                }
+            }
+        } else {
+            response['message'] = 'failed'
+            response['error'] = invoice.errors.allErrors.code
+        }
+        return response
     }
 
     def delete(id) {
+        def invoice = Invoice.get(id)
+        invoice.activeStatus = 'N'
 
+        def response = [:]
+        if (invoice.save(flush: true)) {
+            response['message'] = 'succeed'
+        } else {
+            response['message'] = 'failed'
+        }
+        return response
     }
 
     def checkNo(no, pemilikId) {
