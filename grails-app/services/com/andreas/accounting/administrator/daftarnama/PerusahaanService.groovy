@@ -104,6 +104,7 @@ class PerusahaanService {
                 property('nama', 'nama')
                 property('alamat', 'alamat')
                 property('kota', 'kota')
+                property('pemilik', 'pemilik')
             }
         }[0]
     }
