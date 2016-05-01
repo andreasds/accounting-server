@@ -41,4 +41,9 @@ class InvoicePenjualanController {
     def count() {
         render invoicePenjualanService.count(params, request.JSON)
     }
+
+    def download(long id) {
+        invoicePenjualanService.download(id)
+        render 0
+    }
 }

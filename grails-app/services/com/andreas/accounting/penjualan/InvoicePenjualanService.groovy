@@ -8,10 +8,14 @@ import com.andreas.accounting.util.Invoice
 import com.andreas.accounting.util.MataUang
 import com.andreas.accounting.util.ProdukInvoice
 import grails.transaction.Transactional
+import java.nio.file.Path
 import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class InvoicePenjualanService {
+
+    def invoiceTemplate = 'D:/andreas/privacy/Template_Invoice.xlsx'
+    def invoiceTemp = 'D:/andreas/privacy/tmp/temporary_invoice.xlsx'
 
     def listAll() {
         def invoiceAwals = InvoiceAwal.withCriteria {
@@ -425,5 +429,42 @@ class InvoicePenjualanService {
 
             eq('activeStatus', 'Y')
         }.size()
+    }
+
+    def download(id) {
+        InputStream source = new FileInputStream(new File(invoiceTemplate))
+        OutputStream target = null
+
+        if (source != null) {
+            try {
+                target = new FileOutputStream(new File(invoiceTemp))
+                int read = 0
+                byte[] bytes = new byte[1024]
+
+                while ((read = source.read(bytes)) != -1) {
+                    target.write(bytes, 0, read)
+                }
+            } catch (IOException ex) {
+
+            } finally {
+                if (source != null) {
+                    try {
+                        source.close();
+                    } catch (IOException ex) {
+
+                    }
+                }
+
+                if (target != null) {
+                    try {
+                        target.close();
+                    } catch (IOException ex) {
+
+                    }
+                }
+            }
+        } else {
+
+        }
     }
 }
