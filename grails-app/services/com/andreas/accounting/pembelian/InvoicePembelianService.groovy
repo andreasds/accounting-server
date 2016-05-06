@@ -45,8 +45,10 @@ class InvoicePembelianService {
                 property('id', 'id')
                 property('no', 'no')
                 property('tanggal', 'tanggal')
+                property('rate', 'rate')
                 property('perusahaan', 'perusahaan')
                 property('orang', 'orang')
+                property('mataUang', 'mataUang')
             }
         }
 
@@ -73,7 +75,6 @@ class InvoicePembelianService {
                         property('harga', 'harga')
                         property('rate', 'rate')
                         property('produk', 'produk')
-                        property('mataUang', 'mataUang')
                     }
                 }
                 invoiceModel['produkInvoices'] = produkInvoices
@@ -145,6 +146,7 @@ class InvoicePembelianService {
                 property('id', 'id')
                 property('no', 'no')
                 property('tanggal', 'tanggal')
+                property('rate', 'rate')
                 property('orang', 'orang')
             }
         }
@@ -178,8 +180,8 @@ class InvoicePembelianService {
                     projections {
                         property('id', 'id')
                         property('jumlah', 'jumlah')
-                        property('harga', 'harga')
                         property('rate', 'rate')
+                        property('harga', 'harga')
                     }
                 }
                 invoiceModel['produkInvoices'] = produkInvoices
@@ -192,9 +194,11 @@ class InvoicePembelianService {
         def invoice = new Invoice()
         invoice.no = data.no
         invoice.tanggal = Date.parse('MMM dd, yyyy HH:mm:ss a', data.tanggal)
+        invoice.rate = data.rate
         invoice.activeStatus = 'Y'
         invoice.perusahaan = Perusahaan.get(data.perusahaan.id)
         invoice.orang = Orang.get(data.orang.id)
+        invoice.mataUang = MataUang.get(data.mataUang.id)
 
         def response = [:]
         if (invoice.save(flush: true)) {
@@ -202,10 +206,9 @@ class InvoicePembelianService {
                 def produkInvoice = new ProdukInvoice()
                 produkInvoice.jumlah = temp.jumlah
                 produkInvoice.harga = temp.harga
-                produkInvoice.rate = temp.rate
+                produkInvoice.rate = data.rate
                 produkInvoice.invoice = invoice
                 produkInvoice.produk = Produk.get(temp.produk.id)
-                produkInvoice.mataUang = MataUang.get(temp.mataUang.id)
 
                 if (produkInvoice.save(flush: true)) {
                     response['message'] = 'succeed'
@@ -241,8 +244,10 @@ class InvoicePembelianService {
                 property('id', 'id')
                 property('no', 'no')
                 property('tanggal', 'tanggal')
+                property('rate', 'rate')
                 property('perusahaan', 'perusahaan')
                 property('orang', 'orang')
+                property('mataUang', 'mataUang')
             }
         }
 
@@ -263,6 +268,11 @@ class InvoicePembelianService {
             perusahaan['nama'] = invoiceModel['orang']['perusahaan']['nama']
             orang['perusahaan'] = perusahaan
             invoiceModel['orang'] = orang
+
+            def mataUang = [:]
+            mataUang['id'] = invoiceModel['mataUang']['id']
+            mataUang['kode'] = invoiceModel['mataUang']['kode']
+            invoiceModel['mataUang'] = mataUang
 
             def produkInvoices = ProdukInvoice.withCriteria {
                 resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -285,7 +295,6 @@ class InvoicePembelianService {
                     property('harga', 'harga')
                     property('rate', 'rate')
                     property('produk', 'produk')
-                    property('mataUang', 'mataUang')
                 }
             }
 
@@ -300,11 +309,6 @@ class InvoicePembelianService {
                 kategoriProduk['kode'] = produkInvoice['produk']['kategoriProduk']['kode']
                 produk['kategoriProduk'] = kategoriProduk
                 produkInvoice['produk'] = produk
-
-                def mataUang = [:]
-                mataUang['id'] = produkInvoice['mataUang']['id']
-                mataUang['kode'] = produkInvoice['mataUang']['kode']
-                produkInvoice['mataUang'] = mataUang
             }
             invoiceModel['produkInvoices'] = produkInvoices
         }
@@ -315,8 +319,10 @@ class InvoicePembelianService {
         def invoice = Invoice.get(id)
         invoice.no = data.no
         invoice.tanggal = Date.parse('MMM dd, yyyy HH:mm:ss a', data.tanggal)
+        invoice.rate = data.rate
         invoice.perusahaan = Perusahaan.get(data.perusahaan.id)
         invoice.orang = Orang.get(data.orang.id)
+        invoice.mataUang = MataUang.get(data.mataUang.id)
 
         def response = [:]
         if (invoice.save(flush: true)) {
@@ -324,10 +330,9 @@ class InvoicePembelianService {
                 def produkInvoice = temp.id == 0 ? new ProdukInvoice() : ProdukInvoice.get(temp.id)
                 produkInvoice.jumlah = temp.jumlah
                 produkInvoice.harga = temp.harga
-                produkInvoice.rate = temp.rate
+                produkInvoice.rate = data.rate
                 produkInvoice.invoice = invoice
                 produkInvoice.produk = Produk.get(temp.produk.id)
-                produkInvoice.mataUang = MataUang.get(temp.mataUang.id)
 
                 if (temp.removed) {
                     if (produkInvoice.delete(flush: true)) {

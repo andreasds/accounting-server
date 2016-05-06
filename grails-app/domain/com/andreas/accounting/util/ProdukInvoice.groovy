@@ -13,8 +13,7 @@ class ProdukInvoice {
 
     static belongsTo = [
         invoice: Invoice,
-        produk: Produk,
-        mataUang: MataUang
+        produk: Produk
     ]
 
     static constraints = {
@@ -27,8 +26,7 @@ class ProdukInvoice {
         sort total: 'desc'
         invoice sort: 'no', order: 'asc'
         produk sort: 'deskripsi', order: 'asc'
-        mataUang sort: 'nama', order: 'asc'
 
-        total formula: 'jumlah * rate'
+        total formula: 'jumlah * harga * rate'
     }
 }

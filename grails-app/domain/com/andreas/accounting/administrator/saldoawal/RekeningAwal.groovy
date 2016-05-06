@@ -1,7 +1,7 @@
 package com.andreas.accounting.administrator.saldoawal
 
 import com.andreas.accounting.administrator.daftarnama.Perusahaan
-import com.andreas.accounting.administrator.Rekening
+import com.andreas.accounting.util.Rekening
 import java.math.BigDecimal
 
 class RekeningAwal {

@@ -13,8 +13,7 @@ class InvoiceAwal {
     BigDecimal total
 
     static belongsTo = [
-        invoice: Invoice,
-        mataUang: MataUang
+        invoice: Invoice
     ]
 
     static constraints = {
