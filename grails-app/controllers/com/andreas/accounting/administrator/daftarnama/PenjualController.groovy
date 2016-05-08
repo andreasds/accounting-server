@@ -22,6 +22,10 @@ class PenjualController {
         render penjualService.listNama() as JSON
     }
 
+    def listNamaHutang(long penjualId, long pemilikId) {
+        render penjualService.listNamaHutang(penjualId, pemilikId) as JSON
+    }
+
     def save() {
         render penjualService.save(request.JSON) as JSON
     }

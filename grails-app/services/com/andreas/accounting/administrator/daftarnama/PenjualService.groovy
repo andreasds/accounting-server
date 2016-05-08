@@ -3,10 +3,13 @@ package com.andreas.accounting.administrator.daftarnama
 import com.andreas.accounting.administrator.daftarnama.Orang
 import com.andreas.accounting.administrator.daftarnama.Perusahaan
 import grails.transaction.Transactional
+import groovy.sql.Sql
 import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class PenjualService {
+
+    def dataSource
 
     def listAll() {
         return Orang.withCriteria {
@@ -94,6 +97,75 @@ class PenjualService {
                 property('id', 'id')
                 property('nama', 'nama')
                 property('perusahaan', 'perusahaan')
+            }
+        }
+
+        if (!orangs.empty) {
+            orangs.each { orang ->
+                def perusahaan = [:]
+                perusahaan['id'] = orang['perusahaan']['id']
+                perusahaan['nama'] = orang['perusahaan']['nama']
+                orang['perusahaan'] = perusahaan
+            }
+        }
+        return orangs
+    }
+
+    def listNamaHutang(penjualId, pemilikId) {
+        def db = new Sql(dataSource)
+
+        def query = "SELECT person.id \n\
+            FROM \n\
+            ( \n\
+                SELECT \n\
+                invoice.orang_id AS orang_id, \n\
+                IFNULL((CASE WHEN invoice_initial.id IS NULL THEN SUM(item_invoice.harga * item_invoice.jumlah) ELSE invoice_initial.jumlah END), 0) AS total, \n\
+                IFNULL(SUM(payment.jumlah), 0) AS bayar \n\
+                FROM invoice \n\
+                LEFT JOIN company ON invoice.perusahaan_id=company.id \n\
+                LEFT JOIN invoice_initial ON invoice_initial.invoice_id=invoice.id \n\
+                LEFT JOIN item_invoice ON item_invoice.invoice_id=invoice.id \n\
+                LEFT JOIN payment ON payment.invoice_id=invoice.id \n\
+                WHERE invoice.active_status='Y' \n\
+                AND (company.active_status='Y' AND company.id=${pemilikId}) \n\
+                AND (invoice_initial.active_status IS NULL OR invoice_initial.active_status='Y') \n\
+                AND (payment.active_status IS NULL OR payment.active_status='Y') \n\
+                GROUP BY invoice.id \n\
+            ) hutang \n\
+            LEFT JOIN person ON hutang.orang_id=person.id \n\
+            LEFT JOIN company ON person.perusahaan_id=company.id \n\
+            WHERE (person.active_status='Y' AND person.tipe='VENDOR') \n\
+            AND company.active_status='Y' \n\
+            AND (total - bayar <> 0) \n\
+            GROUP BY person.id"
+
+        def penjuals = []
+        db.rows(query).each { penjual ->
+            penjuals.add(penjual.id)
+        }
+
+        if (penjualId != 0) {
+            if (penjuals.find { it == penjualId } == null) {
+                penjuals.add(penjualId)
+            }
+        }
+
+        def orangs = []
+        if (!penjuals.empty) {
+            orangs = Orang.withCriteria {
+                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                perusahaan {
+                    eq('activeStatus', 'Y')
+                }
+                'in'('id', penjuals)
+                eq('tipe', 'VENDOR')
+                eq('activeStatus', 'Y')
+                order('nama', 'asc')
+                projections {
+                    property('id', 'id')
+                    property('nama', 'nama')
+                    property('perusahaan', 'perusahaan')
+                }
             }
         }
 

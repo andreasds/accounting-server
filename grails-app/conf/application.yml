@@ -102,7 +102,7 @@ environments:
                 urlRoot: /admin/dbconsole
         dataSource:
             dbCreate: update
-            url: jdbc:mysql://localhost:3306/accounting
+            url: jdbc:mysql://localhost:3306/accounting_test
     production:
         grails:
             serverURL: http://192.168.212.100:8081/accounting-server

@@ -18,6 +18,10 @@ class InvoicePembelianController {
         render invoicePembelianService.list(params, request.JSON) as JSON
     }
 
+    def listHutang(long pembayaranId, long penjualId, long pemilikId) {
+        render invoicePembelianService.listHutang(pembayaranId, penjualId, pemilikId) as JSON
+    }
+
     def save() {
         render invoicePembelianService.save(request.JSON) as JSON
     }
