@@ -9,6 +9,16 @@ import com.andreas.accounting.util.MataUang
 import com.andreas.accounting.util.ProdukInvoice
 import grails.transaction.Transactional
 import java.nio.file.Path
+import jxl.Workbook
+import jxl.format.Colour
+import jxl.format.VerticalAlignment
+import jxl.write.Label
+import jxl.write.Number
+import jxl.write.NumberFormat
+import jxl.write.WritableWorkbook
+import jxl.write.WritableCellFormat
+import jxl.write.WritableFont
+import jxl.write.WritableSheet
 import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
@@ -16,6 +26,7 @@ class InvoicePenjualanService {
 
     def invoiceTemplate = 'D:/andreas/privacy/Template_Invoice.xlsx'
     def invoiceTemp = 'D:/andreas/privacy/tmp/temporary_invoice.xlsx'
+    def invoiceTempOutput = "D:/andreas/privacy/tmp/temporary_invoice_output.xlsx"
 
     def listAll() {
         def invoiceAwals = InvoiceAwal.withCriteria {
@@ -432,6 +443,15 @@ class InvoicePenjualanService {
     }
 
     def download(id) {
+        initFormat()
+        copyTemplateFile()
+        createInvoice(id)
+
+        // Send file to client
+        returnFile(invoiceTempOutput)
+    }
+
+    def copyTemplateFile() {
         InputStream source = new FileInputStream(new File(invoiceTemplate))
         OutputStream target = null
 
@@ -463,8 +483,58 @@ class InvoicePenjualanService {
                     }
                 }
             }
-        } else {
+        }
+    }
 
+    WritableFont cellFont
+    WritableCellFormat labelFormat, numberFormat
+
+    def initFormat() {
+        String thousandPattern = "#,##0.00_);[RED]\\(#,##0.00)\\"
+        cellFont = new WritableFont(WritableFont.TAHOMA, 14)
+
+        labelFormat = new WritableCellFormat(cellFont)
+        labelFormat.setBackground(Colour.WHITE)
+        labelFormat.setVerticalAlignment(VerticalAlignment.CENTRE)
+
+        numberFormat = new WritableCellFormat(cellFont, new NumberFormat(thousandPattern))
+        numberFormat.setBackground(Colour.WHITE)
+        labelFormat.setVerticalAlignment(VerticalAlignment.CENTRE)
+    }
+
+    def createInvoice(id) {
+        def outputFile = new File(invoiceTempOutput)
+        Workbook existingWorkbook = Workbook.getWorkbook(new java.io.File(invoiceTemp))
+        WritableWorkbook workbook = Workbook.createWorkbook(outputFile, existingWorkbook)
+        WritableSheet sheet = workbook.getSheet('Invoice')
+
+        def invoice = get(id)
+        def dataRow = 10
+        invoice.produkInvoices.each { produkInvoice ->
+            sheet.insertRow(dataRow)
+            sheet.addCell(new Label(1, dataRow, produkInvoice['produk']['kategoriProduk']['kode'] + '-' + produkInvoice['produk']['indeks'], labelFormat))
+            sheet.addCell(new Label(2, dataRow, produkInvoice['produk']['deskripsi'], labelFormat))
+            sheet.addCell(new Number(3, dataRow, produkInvoice['jumlah'], numberFormat))
+            sheet.addCell(new Number(4, dataRow, produkInvoice['mataUang']['kode'] + ' ' + produkInvoice['harga'], numberFormat))
+        }
+
+        workbook.write();
+        workbook.close();
+        existingWorkbook.close();
+    }
+
+    /**
+     * Returning file as response to front end request
+     */
+    def returnFile(path) {
+        def file = new File(path)
+
+        if (file.exists()) {
+            response.setContentType("application/octet-stream")
+            response.setHeader("Content-disposition", "attachment;filename=\"report\"")
+            response.outputStream << file.bytes
+        } else {
+            render "error!"
         }
     }
 }
