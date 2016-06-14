@@ -9,6 +9,8 @@ import com.andreas.accounting.util.MataUang
 import com.andreas.accounting.util.ProdukInvoice
 import grails.transaction.Transactional
 import java.nio.file.Path
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import jxl.Workbook
 import jxl.format.Colour
 import jxl.format.VerticalAlignment
@@ -487,19 +489,34 @@ class InvoicePenjualanService {
     }
 
     WritableFont cellFont
-    WritableCellFormat labelFormat, numberFormat
+    WritableCellFormat labelFormat
+
+    DecimalFormatSymbols decimalFormatSymbols
+    DecimalFormat decimalFormat, numberFormat
 
     def initFormat() {
-        String thousandPattern = "#,##0.00_);[RED]\\(#,##0.00)\\"
+        String thousandPattern = "#,##0"
+        String decimalPattern = "#,##0.00"
         cellFont = new WritableFont(WritableFont.TAHOMA, 14)
 
         labelFormat = new WritableCellFormat(cellFont)
         labelFormat.setBackground(Colour.WHITE)
         labelFormat.setVerticalAlignment(VerticalAlignment.CENTRE)
 
-        numberFormat = new WritableCellFormat(cellFont, new NumberFormat(thousandPattern))
-        numberFormat.setBackground(Colour.WHITE)
-        labelFormat.setVerticalAlignment(VerticalAlignment.CENTRE)
+        decimalFormatSymbols = new DecimalFormatSymbols();
+        decimalFormatSymbols.setDecimalSeparator(',');
+        decimalFormatSymbols.setGroupingSeparator('.');
+
+        decimalFormat = new DecimalFormat(decimalPattern, decimalFormatSymbols);
+        numberFormat = new DecimalFormat(thousandPattern, decimalFormatSymbols);
+    }
+
+    def numberFormat(number) {
+        return numberFormat.format(number)
+    }
+
+    def decimalFormat(number) {
+        return decimalFormat.format(number)
     }
 
     def createInvoice(id) {
@@ -514,8 +531,9 @@ class InvoicePenjualanService {
             sheet.insertRow(dataRow)
             sheet.addCell(new Label(1, dataRow, produkInvoice['produk']['kategoriProduk']['kode'] + '-' + produkInvoice['produk']['indeks'], labelFormat))
             sheet.addCell(new Label(2, dataRow, produkInvoice['produk']['deskripsi'], labelFormat))
-            sheet.addCell(new Number(3, dataRow, produkInvoice['jumlah'], numberFormat))
-            sheet.addCell(new Number(4, dataRow, produkInvoice['mataUang']['kode'] + ' ' + produkInvoice['harga'], numberFormat))
+            sheet.addCell(new Label(3, dataRow, numberFormat(produkInvoice['jumlah']), labelFormat))
+            sheet.addCell(new Label(4, dataRow, produkInvoice['mataUang']['kode'] + ' ' + decimalFormat(produkInvoice['harga']), labelFormat))
+            sheet.addCell(new Label(5, dataRow, 'Rp ' + decimalFormat(produkInvoice['jumlah'] * produkInvoice['harga'] * produkInvoice['rate']), labelFormat))
         }
 
         workbook.write();
